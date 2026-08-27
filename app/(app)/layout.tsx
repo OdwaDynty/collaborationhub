@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
+import { Sidebar } from "@/components/layout/sidebar";
 
 export default async function AppLayout({
   children,
@@ -24,7 +25,10 @@ export default async function AppLayout({
           </form>
         </div>
       </header>
-      <main className="flex flex-1 flex-col">{children}</main>
+      <div className="flex flex-1 flex-col sm:flex-row">
+        <Sidebar />
+        <main className="flex flex-1 flex-col">{children}</main>
+      </div>
     </div>
   );
 }
