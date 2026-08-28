@@ -1,4 +1,7 @@
+import { redirect } from "next/navigation";
+
 export default function Home() {
+  redirect("/feed");
   return (
     <div className="flex flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
       <div className="text-center">

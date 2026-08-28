@@ -2,12 +2,16 @@ import { getAnnouncements, getCommentsForAnnouncements } from "@/features/announ
 import { AnnouncementCard } from "@/features/announcements/announcement-card";
 import { NewAnnouncementForm } from "@/features/announcements/new-announcement-form";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function AnnouncementsPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) {
+  redirect("/login");
+  }
 
   const { data: profile } = await supabase
     .from("profiles")

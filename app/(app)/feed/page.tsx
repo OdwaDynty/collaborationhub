@@ -3,12 +3,16 @@ import { getCommentsForPosts } from "@/features/comments/queries";
 import { PostCard } from "@/features/posts/post-card";
 import { NewPostForm } from "@/features/posts/new-post-form";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function FeedPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) {
+  redirect("/login");
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
