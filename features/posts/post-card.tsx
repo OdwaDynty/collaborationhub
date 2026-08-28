@@ -1,6 +1,15 @@
 import type { Post } from "@/types/posts";
+import type { Comment } from "@/types/comments";
+import { CommentList } from "@/features/comments/comment-list";
+import { NewCommentForm } from "@/features/comments/new-comment-form";
 
-export function PostCard({ post }: { post: Post }) {
+export function PostCard({
+  post,
+  comments,
+}: {
+  post: Post;
+  comments: Comment[];
+}) {
   return (
     <article className="rounded border p-4">
       <div className="flex items-center justify-between text-sm text-zinc-500">
@@ -19,6 +28,9 @@ export function PostCard({ post }: { post: Post }) {
       <time className="mt-2 block text-xs text-zinc-400">
         {new Date(post.created_at).toLocaleString()}
       </time>
+
+      <CommentList comments={comments} />
+      <NewCommentForm postId={post.id} />
     </article>
   );
 }

@@ -1,4 +1,5 @@
 import { getFeedPosts } from "@/features/posts/queries";
+import { getCommentsForPosts } from "@/features/comments/queries";
 import { PostCard } from "@/features/posts/post-card";
 import { NewPostForm } from "@/features/posts/new-post-form";
 import { createClient } from "@/lib/supabase/server";
@@ -16,6 +17,7 @@ export default async function FeedPage() {
     .single();
 
   const { posts, error } = await getFeedPosts();
+  const commentsByPost = await getCommentsForPosts(posts.map((p) => p.id));
 
   const canPost =
     profile?.can_post_org_wide || profile?.can_post_department;
@@ -40,7 +42,11 @@ export default async function FeedPage() {
       )}
 
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <PostCard
+          key={post.id}
+          post={post}
+          comments={commentsByPost[post.id] ?? []}
+        />
       ))}
     </div>
   );
