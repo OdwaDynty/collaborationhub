@@ -5,6 +5,11 @@ export type AdminEmployee = {
   department_id: string | null;
   birthday: string | null;
   role: "employee" | "admin";
+  is_active: boolean;
+  can_post_org_wide: boolean;
+  can_post_department: boolean;
+  can_create_announcements: boolean;
+  can_create_channels: boolean;
 };
 
 export type Department = {
