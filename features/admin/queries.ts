@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { AdminEmployee, AuditEvent } from "@/types/admin";
+import type { AdminEmployee, AuditEvent, Department } from "@/types/admin";
 
 // Every function here assumes the caller has already verified the
 // current user is an admin at the page level — RLS is the real
