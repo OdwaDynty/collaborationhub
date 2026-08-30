@@ -1,17 +1,23 @@
 import Link from "next/link";
-import { Newspaper, Megaphone, Users, Cake } from "lucide-react";
+import { Home, Megaphone, Users, Cake, Hash, MessageCircle, ShieldCheck } from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/feed", label: "Feed", icon: Newspaper },
+  { href: "/home", label: "Home", icon: Home },
+  { href: "/messages", label: "Messages", icon: MessageCircle },
+  { href: "/channels", label: "Channels", icon: Hash },
   { href: "/announcements", label: "Announcements", icon: Megaphone },
   { href: "/people", label: "People", icon: Users },
   { href: "/birthdays", label: "Birthdays", icon: Cake },
 ];
 
-export function Sidebar() {
+export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
+  const items = isAdmin
+    ? [...NAV_ITEMS, { href: "/admin", label: "Admin", icon: ShieldCheck }]
+    : NAV_ITEMS;
+
   return (
     <nav className="flex gap-1 border-b px-4 py-2 sm:w-56 sm:flex-col sm:border-b-0 sm:border-r sm:px-3 sm:py-4">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+      {items.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
           href={href}

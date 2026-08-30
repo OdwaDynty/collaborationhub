@@ -63,6 +63,6 @@ export async function createPost(
     return { error: "Unable to create post. Please try again." };
   }
 
-  revalidatePath("/feed");
+  revalidatePath("/home");
   return { error: null };
 }

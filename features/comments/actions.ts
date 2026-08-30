@@ -39,6 +39,6 @@ export async function createComment(
     return { error: "Unable to post comment. Please try again." };
   }
 
-  revalidatePath("/feed");
+  revalidatePath("/home");
   return { error: null };
 }

@@ -15,7 +15,9 @@ export function AnnouncementCard({
           {announcement.author.full_name}
         </span>
         <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-          Official
+          {announcement.scope === "organization"
+            ? "Official"
+            : `Official · ${announcement.department?.name ?? "Department"}`}
         </span>
       </div>
       <h3 className="mt-2 font-semibold text-zinc-900 dark:text-zinc-100">
@@ -41,15 +43,7 @@ export function AnnouncementCard({
         </ul>
       )}
 
-      <AnnouncementCommentFormWrapper announcementId={announcement.id} />
+      <NewAnnouncementCommentForm announcementId={announcement.id} />
     </article>
   );
-}
-
-function AnnouncementCommentFormWrapper({
-  announcementId,
-}: {
-  announcementId: string;
-}) {
-  return <NewAnnouncementCommentForm announcementId={announcementId} />;
 }

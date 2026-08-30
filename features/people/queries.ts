@@ -42,3 +42,43 @@ export async function searchPeople(query: string, page: number) {
 
   return { people: (data ?? []) as unknown as DirectoryEntry[], total: count ?? 0, error: null };
 }
+
+
+export type ProfileDetail = {
+  id: string;
+  full_name: string;
+  job_title: string | null;
+  birthday: string | null;
+  department: {
+    name: string;
+    business_unit: { name: string; country: { name: string } } | null;
+  } | null;
+};
+
+export async function getProfileById(id: string): Promise<{
+  profile: ProfileDetail | null;
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select(
+      `
+      id, full_name, job_title, birthday,
+      department:departments (
+        name,
+        business_unit:business_units ( name, country:countries ( name ) )
+      )
+    `
+    )
+    .eq("id", id)
+    .single();
+
+  if (error || !data) {
+    console.error("getProfileById error:", error?.message);
+    return { profile: null, error: "Employee not found." };
+  }
+
+  return { profile: data as unknown as ProfileDetail, error: null };
+}

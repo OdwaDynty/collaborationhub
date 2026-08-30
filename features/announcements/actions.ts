@@ -23,6 +23,8 @@ export async function createAnnouncement(
   const parsed = createAnnouncementSchema.safeParse({
     title: formData.get("title"),
     content: formData.get("content"),
+    scope: formData.get("scope"),
+    department_id: formData.get("department_id") || undefined,
   });
 
   if (!parsed.success) {
@@ -39,10 +41,16 @@ export async function createAnnouncement(
     return { error: "You don't have permission to create announcements." };
   }
 
+  if (parsed.data.scope === "department" && !parsed.data.department_id) {
+    return { error: "Select a department for a department-scoped announcement." };
+  }
+
   const { error } = await supabase.from("announcements").insert({
     author_id: user.id,
     title: parsed.data.title,
     content: parsed.data.content,
+    scope: parsed.data.scope,
+    department_id: parsed.data.scope === "department" ? parsed.data.department_id : null,
   });
 
   if (error) {

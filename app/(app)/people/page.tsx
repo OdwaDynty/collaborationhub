@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { searchPeople } from "@/features/people/queries";
+import { MessageButton } from "@/features/direct-messages/message-button";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function PeoplePage({
   searchParams,
@@ -9,6 +12,11 @@ export default async function PeoplePage({
   const currentPage = Number(page) || 0;
   const { people, total, error } = await searchPeople(q, currentPage);
   const totalPages = Math.ceil(total / 20);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-4 p-6">
@@ -32,45 +40,44 @@ export default async function PeoplePage({
 
       <ul className="divide-y rounded border">
         {people.map((person) => (
-          <li key={person.id} className="p-3">
-            <p className="font-medium">{person.full_name}</p>
-            <p className="text-sm text-zinc-500">
-              {person.job_title ?? "—"}
-              {person.department && ` · ${person.department.name}`}
-              {person.department?.business_unit &&
-                ` · ${person.department.business_unit.name}`}
-              {person.department?.business_unit?.country &&
-                ` · ${person.department.business_unit.country.name}`}
-            </p>
+          <li key={person.id} className="flex items-center justify-between gap-3 p-3">
+            <div>
+              <Link href={`/people/${person.id}`} className="font-medium hover:underline">
+                {person.full_name}
+              </Link>
+              <p className="text-sm text-zinc-500">
+                {person.job_title ?? "—"}
+                {person.department && ` · ${person.department.name}`}
+                {person.department?.business_unit &&
+                  ` · ${person.department.business_unit.name}`}
+                {person.department?.business_unit?.country &&
+                  ` · ${person.department.business_unit.country.name}`}
+              </p>
+            </div>
+            {person.id !== user?.id && <MessageButton profileId={person.id} />}
           </li>
         ))}
       </ul>
 
       {totalPages > 1 && (
         <div className="flex justify-between text-sm">
-          
-           <a href={`?q=${q}&page=${Math.max(0, currentPage - 1)}`}
-            className={
-              currentPage === 0
-                ? "pointer-events-none opacity-40"
-                : "underline"
-            }
+          <Link
+            href={`?q=${q}&page=${Math.max(0, currentPage - 1)}`}
+            className={currentPage === 0 ? "pointer-events-none opacity-40" : "underline"}
           >
             Previous
-          </a>
+          </Link>
           <span>
             Page {currentPage + 1} of {totalPages}
           </span>
-          
-           <a href={`?q=${q}&page=${Math.min(totalPages - 1, currentPage + 1)}`}
+          <Link
+            href={`?q=${q}&page=${Math.min(totalPages - 1, currentPage + 1)}`}
             className={
-              currentPage >= totalPages - 1
-                ? "pointer-events-none opacity-40"
-                : "underline"
+              currentPage >= totalPages - 1 ? "pointer-events-none opacity-40" : "underline"
             }
           >
             Next
-          </a>
+          </Link>
         </div>
       )}
     </div>

@@ -4,14 +4,11 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const auth = await validateApiKey(request);
   if (!auth.valid) {
-    return NextResponse.json({ error: auth.error }, { status: 401 });
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
   const supabase = getServiceClient();
 
-  // Manually restricted to organization-wide posts only — this is
-  // the enforcement RLS would normally provide, done here instead
-  // since the service role key bypasses RLS.
   const { data, error } = await supabase
     .from("posts")
     .select(
@@ -22,10 +19,7 @@ export async function GET(request: Request) {
     .limit(50);
 
   if (error) {
-    return NextResponse.json(
-      { error: "Unable to fetch posts." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Unable to fetch posts." }, { status: 500 });
   }
 
   return NextResponse.json({ posts: data });

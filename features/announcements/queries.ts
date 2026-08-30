@@ -13,8 +13,9 @@ export async function getAnnouncements(): Promise<{
     .from("announcements")
     .select(
       `
-      id, title, content, created_at,
-      author:profiles!announcements_author_id_fkey ( full_name )
+      id, title, content, scope, created_at,
+      author:profiles!announcements_author_id_fkey ( full_name ),
+      department:departments ( name )
     `
     )
     .order("created_at", { ascending: false })
@@ -55,9 +56,7 @@ export async function getCommentsForAnnouncements(
   }
 
   const grouped: Record<string, AnnouncementComment[]> = {};
-  for (const row of data as unknown as (AnnouncementComment & {
-    announcement_id: string;
-  })[]) {
+  for (const row of data as unknown as (AnnouncementComment & { announcement_id: string })[]) {
     grouped[row.announcement_id] = grouped[row.announcement_id] ?? [];
     grouped[row.announcement_id].push(row);
   }
