@@ -25,9 +25,9 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="flex items-center justify-between gap-3 border-b px-6 py-3">
+      <header className="flex items-center justify-between gap-3 bg-teal-700 px-6 py-3 text-white">
         <span className="text-sm font-medium">Zibuke Africa</span>
-        <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+        <div className="flex items-center gap-3 text-sm text-teal-50">
           <SearchBox />
           <NotificationBell summary={summary} />
           <span>{user?.email}</span>
