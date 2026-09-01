@@ -41,7 +41,7 @@ export function NotificationBell({ summary }: { summary: NotificationSummary }) 
       </button>
 
       {open && (
-        <div className="absolute right-0 z-10 mt-2 w-72 rounded border bg-white shadow-lg dark:bg-zinc-950">
+        <div className="absolute right-0 z-10 mt-2 w-72 rounded border bg-white text-zinc-900 shadow-lg dark:bg-zinc-950 dark:text-zinc-100">
           {totalCount === 0 && (
             <p className="p-3 text-sm text-zinc-500">You&apos;re all caught up.</p>
           )}
