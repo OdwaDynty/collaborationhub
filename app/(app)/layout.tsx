@@ -25,14 +25,14 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="flex items-center justify-between gap-3 bg-teal-700 px-6 py-3 text-white">
+      <header className="flex flex-wrap items-center justify-between gap-2 bg-teal-700 px-4 py-3 text-white sm:gap-3 sm:px-6">
         <span className="text-sm font-medium">Zibuke Africa</span>
-        <div className="flex items-center gap-3 text-sm text-teal-50">
+        <div className="flex flex-wrap items-center justify-end gap-2 text-sm text-teal-50 sm:gap-3">
           <SearchBox />
           <NotificationBell summary={summary} />
-          <span>{user?.email}</span>
+          <span className="hidden md:inline">{user?.email}</span>
           <form action={signOut}>
-            <button type="submit" className="underline">
+            <button type="submit" className="shrink-0 underline">
               Sign out
             </button>
           </form>
