@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { search } from "@/features/search/queries";
+import { MessageButton } from "@/features/direct-messages/message-button";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -50,9 +51,14 @@ export default async function SearchPage({
           <h2 className="mb-2 text-xs font-medium text-zinc-500">People</h2>
           <ul className="divide-y rounded border">
             {results.people.map((p) => (
-              <li key={p.id} className="p-3 text-sm">
-                <p className="font-medium">{p.full_name}</p>
-                {p.job_title && <p className="text-zinc-500">{p.job_title}</p>}
+              <li key={p.id} className="flex items-center justify-between gap-3 p-3">
+                <Link href={`/people/${p.id}`} className="min-w-0 hover:underline">
+                  <p className="font-medium">{p.full_name}</p>
+                  {p.job_title && (
+                    <p className="text-sm text-zinc-500">{p.job_title}</p>
+                  )}
+                </Link>
+                {p.id !== user.id && <MessageButton profileId={p.id} />}
               </li>
             ))}
           </ul>
@@ -65,7 +71,7 @@ export default async function SearchPage({
           <ul className="divide-y rounded border">
             {results.posts.map((post) => (
               <li key={post.id} className="p-3 text-sm">
-                <Link href="/feed" className="hover:underline">
+                <Link href="/home" className="hover:underline">
                   <p className="line-clamp-2">{post.content}</p>
                   <time className="text-xs text-zinc-400">
                     {new Date(post.created_at).toLocaleDateString()}
