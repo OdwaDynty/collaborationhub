@@ -2,10 +2,10 @@
   "name": "Zibuke Africa Internal Collaboration Hub",
   "short_name": "Zibuke Africa",
   "description": "Internal collaboration hub for Zibuke Africa employees.",
-  "start_url": "/feed",
+  "start_url": "/home",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#18181b",
+  "theme_color": "#0D4F4A",
   "icons": [
     {
       "src": "/icon-192.png",
