@@ -3,7 +3,20 @@ import type { Conversation } from "@/types/direct-messages";
 
 export function ConversationList({ conversations }: { conversations: Conversation[] }) {
   if (conversations.length === 0) {
-    return <p className="text-sm text-zinc-500">No conversations yet.</p>;
+    return (
+      <div className="rounded border border-dashed p-6 text-center">
+        <p className="text-sm text-zinc-500">
+          No conversations yet.
+        </p>
+        <p className="mt-1 text-sm text-zinc-500">
+          Head to{" "}
+          <Link href="/people" className="font-medium text-teal-700 underline">
+            People
+          </Link>{" "}
+          to find a colleague and start one.
+        </p>
+      </div>
+    );
   }
 
   return (
