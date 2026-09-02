@@ -82,7 +82,12 @@ export async function getDepartmentsForAdmin(): Promise<{
 
   const { data, error } = await supabase
     .from("departments")
-    .select("id, name")
+    .select(
+      `
+      id, name,
+      business_unit:business_units ( name, country:countries ( name ) )
+    `
+    )
     .order("name");
 
   if (error) {
@@ -90,5 +95,15 @@ export async function getDepartmentsForAdmin(): Promise<{
     return { departments: [], error: "Unable to load departments." };
   }
 
-  return { departments: data ?? [], error: null };
+  const departments: Department[] = (data ?? []).map((d) => {
+    const bu = d.business_unit as unknown as { name: string; country: { name: string } | null };
+    return {
+      id: d.id,
+      name: d.name,
+      business_unit_name: bu?.name ?? "",
+      country_name: bu?.country?.name ?? "",
+    };
+  });
+
+  return { departments, error: null };
 }

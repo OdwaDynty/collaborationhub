@@ -108,9 +108,9 @@ export function EmployeeRow({
         >
           <option value="">—</option>
           {departments.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
+           <option key={d.id} value={d.id}>
+               {d.name} — {d.business_unit_name}, {d.country_name}
+           </option>
           ))}
         </select>
       </td>

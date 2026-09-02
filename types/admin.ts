@@ -15,6 +15,8 @@ export type AdminEmployee = {
 export type Department = {
   id: string;
   name: string;
+  business_unit_name: string;
+  country_name: string;
 };
 
 export type AuditEvent = {

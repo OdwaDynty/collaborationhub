@@ -11,7 +11,7 @@ export default async function FeedPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-  redirect("/login");
+    redirect("/login");
   }
 
   const { data: profile } = await supabase
@@ -23,18 +23,22 @@ export default async function FeedPage() {
   const { posts, error } = await getFeedPosts();
   const commentsByPost = await getCommentsForPosts(posts.map((p) => p.id));
 
-  const canPost =
-    profile?.can_post_org_wide || profile?.can_post_department;
+  const canPost = profile?.can_post_org_wide || profile?.can_post_department;
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-3 p-6">
-      {canPost && (
+      {canPost ? (
         <NewPostForm
           permissions={{
             can_post_org_wide: profile!.can_post_org_wide,
             can_post_department: profile!.can_post_department,
           }}
         />
+      ) : (
+        <p className="rounded border border-dashed p-4 text-sm text-zinc-500">
+          You don&apos;t have permission to post yet — contact an
+          administrator if this seems wrong.
+        </p>
       )}
 
       {error && (
