@@ -55,6 +55,29 @@ employee identity to check membership against.
 Returns up to 100 directory entries: name, job title, department.
 Does not include email or any auth-related identifiers.
 
+
+### GET /api/v1/messages
+Requires an owner. `?conversationId=...` returns that thread's messages
+(only if the key's owner is actually a participant); no query param
+returns the owner's list of conversations. Never returns another
+person's private messages.
+
+### POST /api/v1/messages
+Requires a key with `can_write = true`. Sends a message **as the key's
+owner** to a named recipient, finding or creating the conversation
+automatically.
+
+Body:
+```json
+{ "recipientProfileId": "<uuid>", "content": "string, 1-2000 chars" }
+```
+
+### GET /api/v1/files
+Requires an owner. Lists files across every channel the key's owner is
+a member of. `?fileId=...` returns a short-lived (60 second) signed
+download URL for one specific file, only if the owner has access to the
+channel it belongs to.
+
 ## Creating an API key
 No management UI yet — created manually via SQL:
 ```sql
