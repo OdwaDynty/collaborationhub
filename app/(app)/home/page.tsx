@@ -26,7 +26,7 @@ export default async function FeedPage() {
   const canPost = profile?.can_post_org_wide || profile?.can_post_department;
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-3 p-6">
+    <div className="mx-auto w-full max-w-2xl space-y-4 p-6">
       {canPost ? (
         <NewPostForm
           permissions={{
@@ -35,18 +35,18 @@ export default async function FeedPage() {
           }}
         />
       ) : (
-        <p className="rounded border border-dashed p-4 text-sm text-zinc-500">
+        <p className="rounded-xl border border-dashed border-hairline p-4 text-sm text-ink/50">
           You don&apos;t have permission to post yet — contact an
           administrator if this seems wrong.
         </p>
       )}
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!error && posts.length === 0 && (
-        <p className="text-sm text-zinc-500">No posts yet. Check back soon.</p>
+        <p className="text-sm text-ink/50">
+          No posts yet — be the first to share an update.
+        </p>
       )}
 
       {posts.map((post) => (

@@ -37,7 +37,7 @@ export function NewPostForm({ permissions }: { permissions: Permissions }) {
     <form
       id="new-post-form"
       action={handleSubmit}
-      className="space-y-2 rounded border p-4"
+      className="space-y-3 rounded-xl border-[1.5px] border-brand-teal bg-white p-4 transition-shadow focus-within:shadow-sm"
     >
       <textarea
         name="content"
@@ -45,7 +45,7 @@ export function NewPostForm({ permissions }: { permissions: Permissions }) {
         maxLength={2000}
         rows={3}
         placeholder="Share an update..."
-        className="w-full resize-none rounded border px-3 py-2 text-sm"
+        className="w-full resize-none rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
       />
 
       <div className="flex items-center justify-between">
@@ -53,7 +53,7 @@ export function NewPostForm({ permissions }: { permissions: Permissions }) {
           <select
             name="scope"
             defaultValue={defaultScope}
-            className="rounded border px-2 py-1 text-sm"
+            className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-sm text-ink"
           >
             <option value="organization">Organization</option>
             <option value="department">My department</option>
@@ -65,15 +65,13 @@ export function NewPostForm({ permissions }: { permissions: Permissions }) {
         <button
           type="submit"
           disabled={isPending}
-          className="rounded bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+          className="rounded-lg bg-brand-teal px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-teal-ink disabled:opacity-50"
         >
           {isPending ? "Posting..." : "Post"}
         </button>
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </form>
   );
 }
