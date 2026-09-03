@@ -2,22 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Megaphone, Users, Cake, Hash, MessageCircle, ShieldCheck } from "lucide-react";
-
-const NAV_ITEMS = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/messages", label: "Messages", icon: MessageCircle },
-  { href: "/channels", label: "Channels", icon: Hash },
-  { href: "/announcements", label: "Announcements", icon: Megaphone },
-  { href: "/people", label: "People", icon: Users },
-  { href: "/birthdays", label: "Birthdays", icon: Cake },
-];
+import { NAV_ITEMS, ADMIN_NAV_ITEMS } from "@/lib/nav-items";
 
 export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
-  const items = isAdmin
-    ? [...NAV_ITEMS, { href: "/admin", label: "Admin", icon: ShieldCheck }]
-    : NAV_ITEMS;
+  const items = isAdmin ? [...NAV_ITEMS, ...ADMIN_NAV_ITEMS] : NAV_ITEMS;
 
   return (
     <nav className="flex flex-wrap items-center gap-1 bg-brand-teal-ink px-3 py-2 sm:w-56 sm:flex-col sm:items-stretch sm:py-4">

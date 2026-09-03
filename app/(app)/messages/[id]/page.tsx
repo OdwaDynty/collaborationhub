@@ -5,6 +5,14 @@ import { NewMessageForm } from "@/features/direct-messages/new-message-form";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+}
 
 export default async function ConversationPage({
   params,
@@ -34,11 +42,18 @@ export default async function ConversationPage({
     <div className="mx-auto flex h-[calc(100vh-8rem)] w-full max-w-2xl flex-col gap-3 p-6">
       <MarkReadOnMount conversationId={id} />
 
-      <div>
-        <Link href="/messages" className="text-xs text-ink/50 underline">
-          ← Back to messages
+      <div className="flex items-center gap-3 border-b border-hairline pb-3">
+        <Link
+          href="/messages"
+          aria-label="Back to messages"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink/50 transition-colors hover:bg-canvas hover:text-brand-teal"
+        >
+          <ArrowLeft className="h-4 w-4" />
         </Link>
-        <h1 className="font-heading text-lg font-semibold text-ink">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-teal/10 font-heading text-xs font-semibold text-brand-teal-ink">
+          {getInitials(otherParticipant.full_name)}
+        </div>
+        <h1 className="font-heading text-base font-semibold text-ink">
           {otherParticipant.full_name}
         </h1>
       </div>

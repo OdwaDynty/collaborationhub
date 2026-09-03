@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { createPost } from "./actions";
 
 type Permissions = {
@@ -29,6 +30,7 @@ export function NewPostForm({ permissions }: { permissions: Permissions }) {
           "new-post-form"
         ) as HTMLFormElement | null;
         form?.reset();
+        toast.success("Posted");
       }
     });
   }

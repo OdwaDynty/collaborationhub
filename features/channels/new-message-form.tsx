@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { toast } from "sonner";
 import { postChannelMessage } from "./actions";
 
 export function NewMessageForm({ channelId }: { channelId: string }) {
@@ -16,6 +17,7 @@ export function NewMessageForm({ channelId }: { channelId: string }) {
         setError(result.error);
       } else {
         formRef.current?.reset();
+        toast.success("Message sent");
       }
     });
   }

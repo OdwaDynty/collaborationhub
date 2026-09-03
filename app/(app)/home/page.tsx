@@ -26,7 +26,10 @@ export default async function FeedPage() {
   const canPost = profile?.can_post_org_wide || profile?.can_post_department;
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 p-6">
+    <div
+      className="mx-auto w-full max-w-2xl space-y-4 p-6"
+      style={{ animation: "fade-in-up 0.5s ease-out" }}
+    >
       {canPost ? (
         <NewPostForm
           permissions={{

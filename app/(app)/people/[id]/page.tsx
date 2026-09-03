@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getProfileById } from "@/features/people/queries";
 import { MessageButton } from "@/features/direct-messages/message-button";
 import { createClient } from "@/lib/supabase/server";
@@ -37,8 +38,12 @@ export default async function ProfilePage({
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-4 p-6">
-      <Link href="/people" className="text-xs text-ink/50 underline">
-        ← Back to directory
+      <Link
+        href="/people"
+        aria-label="Back to directory"
+        className="flex h-8 w-8 items-center justify-center rounded-full text-ink/50 transition-colors hover:bg-canvas hover:text-brand-teal"
+      >
+        <ArrowLeft className="h-4 w-4" />
       </Link>
 
       <div className="rounded-xl border border-hairline bg-white p-5">

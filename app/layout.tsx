@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
+import { Toaster } from "sonner";
 import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
@@ -30,6 +31,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <PwaRegister />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            classNames: {
+              toast: "!rounded-xl !border-hairline !bg-white !text-ink",
+              title: "!font-heading !font-semibold",
+            },
+          }}
+        />
       </body>
     </html>
   );
