@@ -24,23 +24,23 @@ export default async function AppLayout({
   const summary = await getUnreadSummary();
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <header className="flex flex-wrap items-center justify-between gap-2 bg-teal-700 px-4 py-3 text-white sm:gap-3 sm:px-6">
-        <span className="text-sm font-medium">Zibuke Africa</span>
-        <div className="flex flex-wrap items-center justify-end gap-2 text-sm text-teal-50 sm:gap-3">
+    <div className="flex min-h-full flex-1 flex-col sm:flex-row">
+      <Sidebar isAdmin={profile?.role === "admin"} />
+      <div className="flex flex-1 flex-col">
+        <header className="flex flex-wrap items-center justify-end gap-2 border-b border-hairline bg-white px-4 py-3 text-ink sm:gap-3 sm:px-6">
           <SearchBox />
           <NotificationBell summary={summary} />
-          <span className="hidden md:inline">{user?.email}</span>
+          <span className="hidden text-sm text-ink/60 md:inline">{user?.email}</span>
           <form action={signOut}>
-            <button type="submit" className="shrink-0 underline">
+            <button
+              type="submit"
+              className="shrink-0 text-sm font-medium text-brand-teal underline"
+            >
               Sign out
             </button>
           </form>
-        </div>
-      </header>
-      <div className="flex flex-1 flex-col sm:flex-row">
-        <Sidebar isAdmin={profile?.role === "admin"} />
-        <main className="flex flex-1 flex-col">{children}</main>
+        </header>
+        <main className="flex flex-1 flex-col bg-canvas">{children}</main>
       </div>
     </div>
   );

@@ -7,9 +7,15 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+    --font-sans: var(--font-inter);
+  --font-heading: var(--font-space-grotesk);
+  --color-canvas: #F6F8F7;
+  --color-ink: #12211F;
+  --color-brand-teal: #0D4F4A;
+  --color-brand-teal-ink: #07332F;
+  --color-brand-gold: #9C7A22;
+  --color-brand-gold-light: #D9B96A;
+  --color-hairline: #D8E4E1;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -121,8 +127,8 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
+    body {
+    @apply bg-canvas text-ink;
   }
   html {
     @apply font-sans;
