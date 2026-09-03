@@ -15,12 +15,10 @@ export default async function MessagesPage() {
   const { conversations, error } = await getConversations();
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-3 p-6">
-      <h1 className="font-medium">Messages</h1>
+    <div className="mx-auto w-full max-w-2xl space-y-4 p-6">
+      <h1 className="font-heading text-lg font-semibold text-ink">Messages</h1>
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!error && <ConversationList conversations={conversations} />}
     </div>

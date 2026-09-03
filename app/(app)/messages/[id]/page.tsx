@@ -25,9 +25,7 @@ export default async function ConversationPage({
   if (error || !otherParticipant) {
     return (
       <div className="mx-auto w-full max-w-2xl p-6">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          {error ?? "Conversation not found."}
-        </p>
+        <p className="text-sm text-red-600">{error ?? "Conversation not found."}</p>
       </div>
     );
   }
@@ -37,10 +35,12 @@ export default async function ConversationPage({
       <MarkReadOnMount conversationId={id} />
 
       <div>
-        <Link href="/messages" className="text-xs text-zinc-500 underline">
+        <Link href="/messages" className="text-xs text-ink/50 underline">
           ← Back to messages
         </Link>
-        <h1 className="font-medium">{otherParticipant.full_name}</h1>
+        <h1 className="font-heading text-lg font-semibold text-ink">
+          {otherParticipant.full_name}
+        </h1>
       </div>
 
       <MessageThread messages={messages} currentUserId={user!.id} />
