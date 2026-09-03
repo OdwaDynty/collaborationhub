@@ -25,13 +25,17 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
   }
 
   return (
-    <form ref={formRef} action={handleSubmit} className="space-y-2 rounded border p-4">
+    <form
+      ref={formRef}
+      action={handleSubmit}
+      className="space-y-3 rounded-xl border-[1.5px] border-brand-teal bg-white p-4"
+    >
       <input
         name="title"
         required
         maxLength={200}
         placeholder="Announcement title..."
-        className="w-full rounded border px-3 py-2 text-sm"
+        className="w-full rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
       />
       <textarea
         name="content"
@@ -39,7 +43,7 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
         maxLength={5000}
         rows={3}
         placeholder="Announcement content..."
-        className="w-full resize-none rounded border px-3 py-2 text-sm"
+        className="w-full resize-none rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
       />
 
       <div className="flex items-center justify-between gap-2">
@@ -48,14 +52,18 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
             name="scope"
             value={scope}
             onChange={(e) => setScope(e.target.value as "organization" | "department")}
-            className="rounded border px-2 py-1 text-sm"
+            className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-sm text-ink"
           >
             <option value="organization">Organization</option>
             <option value="department">Specific department</option>
           </select>
 
           {scope === "department" && (
-            <select name="department_id" required className="rounded border px-2 py-1 text-sm">
+            <select
+              name="department_id"
+              required
+              className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-sm text-ink"
+            >
               <option value="">Select department...</option>
               {departments.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -69,13 +77,13 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
         <button
           type="submit"
           disabled={isPending}
-          className="rounded bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+          className="rounded-lg bg-brand-teal px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-teal-ink disabled:opacity-50"
         >
           {isPending ? "Publishing..." : "Publish"}
         </button>
       </div>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </form>
   );
 }
@@ -98,23 +106,23 @@ export function NewAnnouncementCommentForm({ announcementId }: { announcementId:
   }
 
   return (
-    <form ref={formRef} action={handleSubmit} className="mt-2 flex gap-2">
+    <form ref={formRef} action={handleSubmit} className="mt-3 flex gap-2 border-t border-hairline pt-3">
       <input type="hidden" name="announcementId" value={announcementId} />
       <input
         name="content"
         placeholder="Write a comment..."
         maxLength={1000}
         required
-        className="flex-1 rounded border px-2 py-1 text-sm"
+        className="flex-1 rounded-lg border border-hairline bg-canvas px-3 py-1.5 text-sm text-ink focus:border-brand-teal focus:outline-none"
       />
       <button
         type="submit"
         disabled={isPending}
-        className="rounded border px-3 py-1 text-sm disabled:opacity-50"
+        className="rounded-lg border border-hairline px-3 py-1.5 text-sm text-ink/70 transition-colors hover:bg-canvas disabled:opacity-50"
       >
         {isPending ? "..." : "Reply"}
       </button>
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </form>
   );
 }
