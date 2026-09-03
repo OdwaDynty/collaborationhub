@@ -35,11 +35,16 @@ export default async function ChannelDetailPage({
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-6">
       <MarkChannelReadOnMount channelId={id} />
 
-      <div>
-        <h1 className="font-heading text-lg font-semibold text-ink"># {channel.name}</h1>
-        {channel.description && (
-          <p className="text-sm text-ink/50">{channel.description}</p>
-        )}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-teal">
+          <span className="font-heading text-base font-semibold text-white">#</span>
+        </div>
+        <div>
+          <h1 className="font-heading text-lg font-semibold text-ink">{channel.name}</h1>
+          {channel.description && (
+            <p className="text-sm text-ink/50">{channel.description}</p>
+          )}
+        </div>
       </div>
 
       {messagesError && <p className="text-sm text-red-600">{messagesError}</p>}

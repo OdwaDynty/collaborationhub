@@ -28,35 +28,40 @@ export default async function SearchPage({
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4 p-6">
-      <form className="flex gap-2">
+      <form className="flex gap-2 rounded-xl border-[1.5px] border-brand-teal bg-white p-2">
         <input
           name="q"
           defaultValue={q}
           placeholder="Search people, posts, announcements, channels..."
-          className="flex-1 rounded border px-3 py-2 text-sm"
+          className="flex-1 rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
         />
-        <button type="submit" className="rounded border px-4 py-2 text-sm">
+        <button
+          type="submit"
+          className="rounded-lg bg-brand-teal px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-teal-ink"
+        >
           Search
         </button>
       </form>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!error && q.trim() && totalCount === 0 && (
-        <p className="text-sm text-zinc-500">No results for &quot;{q}&quot;.</p>
+        <p className="text-sm text-ink/50">No results for &quot;{q}&quot;.</p>
       )}
 
       {results.people.length > 0 && (
         <section>
-          <h2 className="mb-2 text-xs font-medium text-zinc-500">People</h2>
-          <ul className="divide-y rounded border">
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/40">
+            People
+          </h2>
+          <ul className="divide-y divide-hairline rounded-xl border border-hairline bg-white">
             {results.people.map((p) => (
               <li key={p.id} className="flex items-center justify-between gap-3 p-3">
                 <Link href={`/people/${p.id}`} className="min-w-0 hover:underline">
-                  <p className="font-medium">{p.full_name}</p>
-                  {p.job_title && (
-                    <p className="text-sm text-zinc-500">{p.job_title}</p>
-                  )}
+                  <p className="font-heading text-sm font-semibold text-ink">
+                    {p.full_name}
+                  </p>
+                  {p.job_title && <p className="text-sm text-ink/50">{p.job_title}</p>}
                 </Link>
                 {p.id !== user.id && <MessageButton profileId={p.id} />}
               </li>
@@ -67,13 +72,15 @@ export default async function SearchPage({
 
       {results.posts.length > 0 && (
         <section>
-          <h2 className="mb-2 text-xs font-medium text-zinc-500">Feed posts</h2>
-          <ul className="divide-y rounded border">
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/40">
+            Feed posts
+          </h2>
+          <ul className="divide-y divide-hairline rounded-xl border border-hairline bg-white">
             {results.posts.map((post) => (
               <li key={post.id} className="p-3 text-sm">
                 <Link href="/home" className="hover:underline">
-                  <p className="line-clamp-2">{post.content}</p>
-                  <time className="text-xs text-zinc-400">
+                  <p className="line-clamp-2 text-ink/80">{post.content}</p>
+                  <time className="text-xs text-ink/40">
                     {new Date(post.created_at).toLocaleDateString()}
                   </time>
                 </Link>
@@ -85,13 +92,15 @@ export default async function SearchPage({
 
       {results.announcements.length > 0 && (
         <section>
-          <h2 className="mb-2 text-xs font-medium text-zinc-500">Announcements</h2>
-          <ul className="divide-y rounded border">
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/40">
+            Announcements
+          </h2>
+          <ul className="divide-y divide-hairline rounded-xl border border-hairline bg-white">
             {results.announcements.map((a) => (
               <li key={a.id} className="p-3 text-sm">
                 <Link href="/announcements" className="hover:underline">
-                  <p className="font-medium">{a.title}</p>
-                  <time className="text-xs text-zinc-400">
+                  <p className="font-heading font-semibold text-ink">{a.title}</p>
+                  <time className="text-xs text-ink/40">
                     {new Date(a.created_at).toLocaleDateString()}
                   </time>
                 </Link>
@@ -103,13 +112,15 @@ export default async function SearchPage({
 
       {results.channels.length > 0 && (
         <section>
-          <h2 className="mb-2 text-xs font-medium text-zinc-500">Channels</h2>
-          <ul className="divide-y rounded border">
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/40">
+            Channels
+          </h2>
+          <ul className="divide-y divide-hairline rounded-xl border border-hairline bg-white">
             {results.channels.map((c) => (
               <li key={c.id} className="p-3 text-sm">
                 <Link href={`/channels/${c.id}`} className="hover:underline">
-                  <p className="font-medium"># {c.name}</p>
-                  {c.description && <p className="text-zinc-500">{c.description}</p>}
+                  <p className="font-heading font-semibold text-ink"># {c.name}</p>
+                  {c.description && <p className="text-ink/50">{c.description}</p>}
                 </Link>
               </li>
             ))}

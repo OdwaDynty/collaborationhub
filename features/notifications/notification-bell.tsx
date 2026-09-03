@@ -29,32 +29,34 @@ export function NotificationBell({ summary }: { summary: NotificationSummary }) 
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative rounded p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+        className="relative rounded-lg p-1.5 text-ink/60 transition-colors hover:bg-canvas hover:text-ink"
         aria-label="Notifications"
       >
         <Bell className="h-4 w-4" />
         {totalCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-medium text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-gold px-1 text-[10px] font-medium text-white">
             {totalCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-10 mt-2 w-72 rounded border bg-white text-zinc-900 shadow-lg dark:bg-zinc-950 dark:text-zinc-100">
+        <div className="absolute right-0 z-10 mt-2 w-72 rounded-xl border border-hairline bg-white text-ink shadow-lg">
           {totalCount === 0 && (
-            <p className="p-3 text-sm text-zinc-500">You&apos;re all caught up.</p>
+            <p className="p-3 text-sm text-ink/50">You&apos;re all caught up.</p>
           )}
 
           {summary.directMessages.items.length > 0 && (
-            <div className="border-b p-2">
-              <p className="px-1 py-1 text-xs font-medium text-zinc-500">Messages</p>
+            <div className="border-b border-hairline p-2">
+              <p className="px-1 py-1 text-xs font-medium uppercase tracking-wide text-ink/40">
+                Messages
+              </p>
               {summary.directMessages.items.map((item) => (
                 <Link
                   key={item.id}
                   href={`/messages/${item.conversationId}`}
                   onClick={handleDmClick}
-                  className="block truncate rounded px-2 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                  className="block truncate rounded-lg px-2 py-1.5 text-sm text-ink/80 transition-colors hover:bg-canvas"
                 >
                   {item.content}
                 </Link>
@@ -63,14 +65,16 @@ export function NotificationBell({ summary }: { summary: NotificationSummary }) 
           )}
 
           {summary.channelsWithUnread.length > 0 && (
-            <div className="border-b p-2">
-              <p className="px-1 py-1 text-xs font-medium text-zinc-500">Channels</p>
+            <div className="border-b border-hairline p-2">
+              <p className="px-1 py-1 text-xs font-medium uppercase tracking-wide text-ink/40">
+                Channels
+              </p>
               {summary.channelsWithUnread.map((c) => (
                 <Link
                   key={c.channelId}
                   href={`/channels/${c.channelId}`}
                   onClick={() => setOpen(false)}
-                  className="block rounded px-2 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                  className="block rounded-lg px-2 py-1.5 text-sm text-ink/80 transition-colors hover:bg-canvas"
                 >
                   New activity in # {c.name}
                 </Link>
@@ -83,7 +87,7 @@ export function NotificationBell({ summary }: { summary: NotificationSummary }) 
               <Link
                 href="/announcements"
                 onClick={() => setOpen(false)}
-                className="block rounded px-2 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                className="block rounded-lg px-2 py-1.5 text-sm text-ink/80 transition-colors hover:bg-canvas"
               >
                 New announcement
               </Link>

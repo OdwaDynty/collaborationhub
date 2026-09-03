@@ -21,7 +21,11 @@ export function NewMessageForm({ channelId }: { channelId: string }) {
   }
 
   return (
-    <form ref={formRef} action={handleSubmit} className="flex gap-2 border-t border-hairline pt-3">
+    <form
+      ref={formRef}
+      action={handleSubmit}
+      className="flex gap-2 rounded-xl border-[1.5px] border-brand-teal bg-white p-2"
+    >
       <input
         name="content"
         placeholder="Message this channel..."
