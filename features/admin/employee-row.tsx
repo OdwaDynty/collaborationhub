@@ -15,6 +15,13 @@ const FLAGS: { key: keyof AdminEmployee; label: string }[] = [
   { key: "can_create_channels", label: "Channels" },
 ];
 
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+}
+
 export function EmployeeRow({
   employee,
   departments,
@@ -84,77 +91,92 @@ export function EmployeeRow({
   }
 
   return (
-    <tr className={employee.is_active ? "" : "opacity-50"}>
-      <td className="p-2 text-sm">
-        <p className="font-medium">{employee.full_name}</p>
-        {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
-      </td>
-      <td className="p-2">
+    <div
+      className={`rounded-xl border border-hairline bg-white p-4 ${
+        employee.is_active ? "" : "opacity-50"
+      }`}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-teal/10 font-heading text-xs font-semibold text-brand-teal-ink">
+            {getInitials(employee.full_name)}
+          </div>
+          <p className="font-heading text-sm font-semibold text-ink">{employee.full_name}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={employee.role}
+            disabled={isPending}
+            onChange={(e) => handleRoleChange(e.target.value as "employee" | "admin")}
+            className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-xs text-ink"
+          >
+            <option value="employee">Employee</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button
+            onClick={handleActiveToggle}
+            disabled={isPending}
+            className="rounded-lg border border-hairline px-3 py-1 text-xs text-ink/70 transition-colors hover:bg-canvas disabled:opacity-50"
+          >
+            {employee.is_active ? "Deactivate" : "Activate"}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
         <input
           value={jobTitle}
           onChange={(e) => setJobTitle(e.target.value)}
           onBlur={handleJobTitleBlur}
           disabled={isPending}
-          placeholder="—"
-          className="w-32 rounded border px-1 py-0.5 text-xs"
+          placeholder="Job title"
+          className="w-40 rounded-lg border border-hairline bg-canvas px-2 py-1 text-xs text-ink"
         />
-      </td>
-      <td className="p-2">
         <select
           value={employee.department_id ?? ""}
           disabled={isPending}
           onChange={(e) => handleDepartmentChange(e.target.value)}
-          className="w-32 rounded border px-1 py-0.5 text-xs"
+          className="w-48 rounded-lg border border-hairline bg-canvas px-2 py-1 text-xs text-ink"
         >
-          <option value="">—</option>
+          <option value="">No department</option>
           {departments.map((d) => (
-           <option key={d.id} value={d.id}>
-               {d.name} — {d.business_unit_name}, {d.country_name}
-           </option>
+            <option key={d.id} value={d.id}>
+              {d.name} — {d.business_unit_name}, {d.country_name}
+            </option>
           ))}
         </select>
-      </td>
-      <td className="p-2">
         <input
           type="date"
           value={birthday}
           onChange={(e) => setBirthday(e.target.value)}
           onBlur={handleBirthdayBlur}
           disabled={isPending}
-          className="w-32 rounded border px-1 py-0.5 text-xs"
+          className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-xs text-ink"
         />
-      </td>
-      <td className="p-2">
-        <select
-          value={employee.role}
-          disabled={isPending}
-          onChange={(e) => handleRoleChange(e.target.value as "employee" | "admin")}
-          className="rounded border px-1 py-0.5 text-xs"
-        >
-          <option value="employee">Employee</option>
-          <option value="admin">Admin</option>
-        </select>
-      </td>
-      {FLAGS.map(({ key, label }) => (
-        <td key={key} className="p-2 text-center">
-          <input
-            type="checkbox"
-            checked={employee[key] as boolean}
-            disabled={isPending}
-            onChange={() => handleFlagToggle(key, employee[key] as boolean)}
-            aria-label={label}
-          />
-        </td>
-      ))}
-      <td className="p-2 text-center">
-        <button
-          onClick={handleActiveToggle}
-          disabled={isPending}
-          className="rounded border px-2 py-1 text-xs disabled:opacity-50"
-        >
-          {employee.is_active ? "Deactivate" : "Activate"}
-        </button>
-      </td>
-    </tr>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {FLAGS.map(({ key, label }) => {
+          const checked = employee[key] as boolean;
+          return (
+            <button
+              key={key}
+              type="button"
+              disabled={isPending}
+              onClick={() => handleFlagToggle(key, checked)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                checked
+                  ? "bg-brand-teal/10 text-brand-teal-ink"
+                  : "bg-canvas text-ink/40"
+              }`}
+            >
+              {label} {checked ? "✓" : ""}
+            </button>
+          );
+        })}
+      </div>
+
+      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+    </div>
   );
 }

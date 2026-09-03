@@ -20,7 +20,7 @@ export default async function AdminPage() {
 
   const isAdmin = await isCurrentUserAdmin();
   if (!isAdmin) {
-    redirect("/feed");
+    redirect("/home");
   }
 
   const { employees, error: employeesError } = await getEmployeesForAdmin();
@@ -28,22 +28,18 @@ export default async function AdminPage() {
   const { events, error: eventsError } = await getAuditEvents();
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-6 p-6">
+    <div className="mx-auto w-full max-w-5xl space-y-8 p-6">
       <section>
-        <h1 className="mb-3 font-medium">Employees</h1>
-        {employeesError && (
-          <p className="text-sm text-red-600 dark:text-red-400">{employeesError}</p>
-        )}
+        <h1 className="mb-3 font-heading text-lg font-semibold text-ink">Employees</h1>
+        {employeesError && <p className="text-sm text-red-600">{employeesError}</p>}
         {!employeesError && (
           <EmployeeTable employees={employees} departments={departments} />
         )}
       </section>
 
       <section>
-        <h2 className="mb-3 font-medium">Audit log</h2>
-        {eventsError && (
-          <p className="text-sm text-red-600 dark:text-red-400">{eventsError}</p>
-        )}
+        <h2 className="mb-3 font-heading text-lg font-semibold text-ink">Audit log</h2>
+        {eventsError && <p className="text-sm text-red-600">{eventsError}</p>}
         {!eventsError && <AuditLog events={events} />}
       </section>
     </div>
