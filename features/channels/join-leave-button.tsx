@@ -24,17 +24,19 @@ export function JoinLeaveButton({
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex shrink-0 flex-col items-end gap-1">
       <button
         onClick={handleClick}
         disabled={isPending}
-        className="rounded border px-3 py-1 text-sm disabled:opacity-50"
+        className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+          isMember
+            ? "border border-hairline text-ink/60 hover:bg-canvas"
+            : "bg-brand-teal text-white hover:bg-brand-teal-ink"
+        }`}
       >
         {isPending ? "..." : isMember ? "Leave" : "Join"}
       </button>
-      {error && (
-        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 }

@@ -22,12 +22,10 @@ export default async function ChannelsPage() {
   const { channels, error } = await getChannels();
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-3 p-6">
+    <div className="mx-auto w-full max-w-2xl space-y-4 p-6">
       {profile?.can_create_channels && <NewChannelForm />}
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!error && <ChannelList channels={channels} />}
     </div>

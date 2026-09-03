@@ -24,9 +24,7 @@ export default async function ChannelDetailPage({
   if (channelError || !channel) {
     return (
       <div className="mx-auto w-full max-w-2xl p-6">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          {channelError ?? "Channel not found."}
-        </p>
+        <p className="text-sm text-red-600">{channelError ?? "Channel not found."}</p>
       </div>
     );
   }
@@ -38,22 +36,20 @@ export default async function ChannelDetailPage({
       <MarkChannelReadOnMount channelId={id} />
 
       <div>
-        <h1 className="font-medium"># {channel.name}</h1>
+        <h1 className="font-heading text-lg font-semibold text-ink"># {channel.name}</h1>
         {channel.description && (
-          <p className="text-sm text-zinc-500">{channel.description}</p>
+          <p className="text-sm text-ink/50">{channel.description}</p>
         )}
       </div>
 
-      {messagesError && (
-        <p className="text-sm text-red-600 dark:text-red-400">{messagesError}</p>
-      )}
+      {messagesError && <p className="text-sm text-red-600">{messagesError}</p>}
 
       {!messagesError && <MessageList messages={messages} />}
 
       {isMember ? (
         <NewMessageForm channelId={id} />
       ) : (
-        <p className="text-sm text-zinc-500">Join this channel to post messages.</p>
+        <p className="text-sm text-ink/50">Join this channel to post messages.</p>
       )}
     </div>
   );
