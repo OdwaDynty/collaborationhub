@@ -1,4 +1,4 @@
-import { getFilesForUserChannels } from "@/features/files/queries";
+import { getFilesForUserChannels, getAdminChannelIds } from "@/features/files/queries";
 import { getChannels } from "@/features/channels/queries";
 import { FileList } from "@/features/files/file-list";
 import { UploadForm } from "@/features/files/upload-form";
@@ -18,6 +18,9 @@ export default async function FilesPage() {
   const myChannels = channels.filter((c) => c.is_member).map((c) => ({ id: c.id, name: c.name }));
 
   const { files, error } = await getFilesForUserChannels();
+  // Fetched once here and passed down — cheaper than FileList (or each
+  // row) re-checking admin status per file individually.
+  const adminChannelIds = await getAdminChannelIds();
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4 p-6">
@@ -27,7 +30,14 @@ export default async function FilesPage() {
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      {!error && <FileList files={files} showChannel />}
+      {!error && (
+        <FileList
+          files={files}
+          currentUserId={user.id}
+          adminChannelIds={adminChannelIds}
+          showChannel
+        />
+      )}
     </div>
   );
 }
