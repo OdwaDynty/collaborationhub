@@ -28,3 +28,13 @@ export type AuditEvent = {
   created_at: string;
   actor: { full_name: string } | null;
 };
+
+export type ApiKey = {
+  id: string;
+  name: string;
+  owner_name: string | null;
+  can_write: boolean;
+  created_at: string;
+  last_used_at: string | null;
+  revoked_at: string | null;
+};

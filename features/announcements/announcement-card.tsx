@@ -4,14 +4,22 @@ import type { Announcement, AnnouncementComment } from "@/types/announcements";
 import { NewAnnouncementCommentForm } from "./new-announcement-form";
 import { InlineDeleteButton } from "@/features/shared/inline-delete-button";
 import { deleteAnnouncementComment } from "./actions";
+import { deleteAnnouncement } from "@/features/admin/actions";
 import { createClient } from "@/lib/supabase/server";
 
 export async function AnnouncementCard({
   announcement,
   comments,
+  isAdmin,
 }: {
   announcement: Announcement;
   comments: AnnouncementComment[];
+  // Whether the CURRENT viewer is an admin — controls whether they see
+  // a delete option on this announcement at all. Unlike comments
+  // (where only the comment's own author can delete it), any admin
+  // can delete any announcement, since these are official company
+  // communications, not personal posts.
+  isAdmin: boolean;
 }) {
   const supabase = await createClient();
   const {
@@ -19,16 +27,25 @@ export async function AnnouncementCard({
   } = await supabase.auth.getUser();
 
   return (
-    <article className="rounded-xl border border-hairline bg-white p-4">
+    <article className="group rounded-xl border border-hairline bg-white p-4">
       <div className="flex items-center justify-between gap-2">
         <span className="font-heading text-sm font-semibold text-ink">
           {announcement.author.full_name}
         </span>
-        <span className="shrink-0 rounded-full bg-brand-gold/15 px-3 py-1 text-xs font-semibold text-brand-gold">
-          {announcement.scope === "organization"
-            ? "Official"
-            : `Official · ${announcement.department?.name ?? "Department"}`}
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="rounded-full bg-brand-gold/15 px-3 py-1 text-xs font-semibold text-brand-gold">
+            {announcement.scope === "organization"
+              ? "Official"
+              : `Official · ${announcement.department?.name ?? "Department"}`}
+          </span>
+          {isAdmin && (
+            <InlineDeleteButton
+              deleteAction={deleteAnnouncement}
+              args={[announcement.id]}
+              successMessage="Announcement deleted"
+            />
+          )}
+        </div>
       </div>
       <h3 className="mt-2 font-heading text-base font-semibold text-brand-teal-ink">
         {announcement.title}
@@ -66,11 +83,11 @@ export async function AnnouncementCard({
                 <span className="text-ink/70">{c.content}</span>
               </p>
               {user?.id === c.authorId && (
-               <InlineDeleteButton
+                <InlineDeleteButton
                   deleteAction={deleteAnnouncementComment}
                   args={[c.id]}
                   successMessage="Comment deleted"
-                 />
+                />
               )}
             </li>
           ))}

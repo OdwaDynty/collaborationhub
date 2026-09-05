@@ -18,6 +18,7 @@ export async function getAnnouncements(): Promise<{
       department:departments ( name )
     `
     )
+    .eq("is_deleted", false)
     .order("created_at", { ascending: false })
     .limit(ANNOUNCEMENTS_PAGE_SIZE);
 

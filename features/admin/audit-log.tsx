@@ -10,6 +10,8 @@ const ACTION_LABELS: Record<string, string> = {
   channel_created: "Channel created",
   channel_archived: "Channel archived",
   channel_unarchived: "Channel unarchived",
+  announcement_deleted: "Announcement deleted",
+  api_key_revoked: "API key revoked",
 };
 
 export function AuditLog({ events }: { events: AuditEvent[] }) {

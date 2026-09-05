@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import type { AdminEmployee, AuditEvent, Department } from "@/types/admin";
+import type { AdminEmployee, AuditEvent, Department, ApiKey } from "@/types/admin";
+
 
 // Every function here assumes the caller has already verified the
 // current user is an admin at the page level — RLS is the real
@@ -157,4 +158,28 @@ export async function getArchivedChannelsForAdmin(): Promise<{
   }
 
   return { channels: data ?? [], error: null };
+}
+
+/**
+ * Lists every API key for the Admin page's revocation UI. Calls the
+ * get_api_keys_for_admin() database function rather than querying the
+ * api_keys table directly — that table has no RLS policies granting
+ * authenticated users anything at all, admin or not, so a plain
+ * .from("api_keys").select() here would simply return nothing. The
+ * function also deliberately never returns key_hash — there's no
+ * legitimate reason this UI needs to see it.
+ */
+export async function getApiKeysForAdmin(): Promise<{
+  keys: ApiKey[];
+  error: string | null;
+}> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_api_keys_for_admin");
+
+  if (error) {
+    console.error("getApiKeysForAdmin error:", error.message);
+    return { keys: [], error: "Unable to load API keys." };
+  }
+
+  return { keys: (data ?? []) as ApiKey[], error: null };
 }

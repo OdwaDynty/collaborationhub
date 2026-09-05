@@ -4,11 +4,13 @@ import {
   getAuditEvents,
   getActiveChannelsForAdmin,
   getArchivedChannelsForAdmin,
+  getApiKeysForAdmin,
   isCurrentUserAdmin,
 } from "@/features/admin/queries";
 import { EmployeeTable } from "@/features/admin/employee-table";
 import { AuditLog } from "@/features/admin/audit-log";
 import { ChannelListAdmin } from "@/features/admin/channel-list-admin";
+import { ApiKeyList } from "@/features/admin/api-key-list";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -33,6 +35,7 @@ export default async function AdminPage() {
     await getActiveChannelsForAdmin();
   const { channels: archivedChannels, error: archivedChannelsError } =
     await getArchivedChannelsForAdmin();
+  const { keys, error: keysError } = await getApiKeysForAdmin();
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8 p-6">
@@ -65,6 +68,12 @@ export default async function AdminPage() {
           )}
         </section>
       )}
+
+      <section>
+        <h2 className="mb-3 font-heading text-lg font-semibold text-ink">API keys</h2>
+        {keysError && <p className="text-sm text-red-600">{keysError}</p>}
+        {!keysError && <ApiKeyList keys={keys} />}
+      </section>
 
       <section>
         <h2 className="mb-3 font-heading text-lg font-semibold text-ink">Audit log</h2>

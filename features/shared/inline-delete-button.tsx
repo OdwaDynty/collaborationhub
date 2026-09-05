@@ -28,10 +28,15 @@ export function InlineDeleteButton<Args extends unknown[]>({
   deleteAction,
   args,
   successMessage = "Deleted",
+  confirmLabel = "Confirm",
 }: {
   deleteAction: (...args: Args) => Promise<{ error: string | null }>;
   args: Args;
   successMessage?: string;
+  // Lets a caller override the confirm button's own label — used by
+  // ApiKeyList to say "Revoke" instead of the generic "Confirm", so
+  // the action being confirmed reads clearly in context.
+  confirmLabel?: string;
 }) {
   const [confirming, setConfirming] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -56,7 +61,7 @@ export function InlineDeleteButton<Args extends unknown[]>({
           disabled={isPending}
           className="rounded-md bg-red-600 px-2 py-0.5 text-[11px] font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
         >
-          {isPending ? "..." : "Confirm"}
+          {isPending ? "..." : confirmLabel}
         </button>
         <button
           onClick={() => setConfirming(false)}

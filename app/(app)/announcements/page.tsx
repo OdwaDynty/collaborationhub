@@ -3,6 +3,7 @@ import { getAnnouncements, getCommentsForAnnouncements } from "@/features/announ
 import { AnnouncementCard } from "@/features/announcements/announcement-card";
 import { NewAnnouncementForm } from "@/features/announcements/new-announcement-form";
 import { MarkAnnouncementsReadOnMount } from "@/features/notifications/mark-announcements-read-on-mount";
+import { isCurrentUserAdmin } from "@/features/admin/queries";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -30,6 +31,10 @@ export default async function AnnouncementsPage() {
   const commentsByAnnouncement = await getCommentsForAnnouncements(
     announcements.map((a) => a.id)
   );
+  // Fetched once here rather than inside AnnouncementCard itself, since
+  // it's the same value for every card on the page — no reason to ask
+  // "is this user an admin?" once per announcement rendered.
+  const isAdmin = await isCurrentUserAdmin();
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4 p-6">
@@ -41,9 +46,6 @@ export default async function AnnouncementsPage() {
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      {/* Same "icon in a circle + headline + helpful sentence" pattern
-          already used on Channels/Files/Messages — this was the one
-          page in that family still showing a bare gray sentence. */}
       {!error && announcements.length === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-hairline bg-white py-10 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-teal/10">
@@ -61,6 +63,7 @@ export default async function AnnouncementsPage() {
           key={a.id}
           announcement={a}
           comments={commentsByAnnouncement[a.id] ?? []}
+          isAdmin={isAdmin}
         />
       ))}
     </div>
