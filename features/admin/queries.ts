@@ -107,3 +107,54 @@ export async function getDepartmentsForAdmin(): Promise<{
 
   return { departments, error: null };
 }
+
+/**
+ * Lists every currently active (not-yet-archived) channel, for the
+ * Admin page's channel management section. Only shows active
+ * channels — an already-archived one has nothing further an admin
+ * needs to do to it here.
+ */
+export async function getActiveChannelsForAdmin(): Promise<{
+  channels: { id: string; name: string; visibility: "public" | "private" }[];
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("channels")
+    .select("id, name, visibility")
+    .eq("is_archived", false)
+    .order("name");
+
+  if (error) {
+    console.error("getActiveChannelsForAdmin error:", error.message);
+    return { channels: [], error: "Unable to load channels." };
+  }
+
+  return { channels: data ?? [], error: null };
+}
+
+/**
+ * Lists every currently archived channel, so Admin can show an
+ * "Unarchive" option for each — the counterpart to
+ * getActiveChannelsForAdmin above.
+ */
+export async function getArchivedChannelsForAdmin(): Promise<{
+  channels: { id: string; name: string; visibility: "public" | "private" }[];
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("channels")
+    .select("id, name, visibility")
+    .eq("is_archived", true)
+    .order("name");
+
+  if (error) {
+    console.error("getArchivedChannelsForAdmin error:", error.message);
+    return { channels: [], error: "Unable to load archived channels." };
+  }
+
+  return { channels: data ?? [], error: null };
+}

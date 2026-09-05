@@ -31,6 +31,20 @@ export async function uploadFile(formData: FormData): Promise<{ error: string | 
 
   const { channelId } = parsed.data;
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    // Same reasoning as the postChannelMessage check — the database's
+  // files_insert_if_member RLS policy would block this too, but this
+  // gives a specific, honest error instead of a generic failure.
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("is_archived")
+    .eq("id", parsed.data.channelId)
+    .single();
+
+  if (channel?.is_archived) {
+    return { error: "This channel has been archived and no longer accepts new files." };
+  }
+
   const storagePath = `${channelId}/${crypto.randomUUID()}-${safeName}`;
 
   const { error: uploadError } = await supabase.storage

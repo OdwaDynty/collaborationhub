@@ -4,6 +4,7 @@ import { NewMessageForm } from "@/features/channels/new-message-form";
 import { MarkChannelReadOnMount } from "@/features/notifications/mark-channel-read-on-mount";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { Archive } from "lucide-react";
 
 export default async function ChannelDetailPage({
   params,
@@ -47,11 +48,26 @@ export default async function ChannelDetailPage({
         </div>
       </div>
 
+      {/* An archived channel is intentionally still fully readable —
+          history stays available for reference — but visitors get a
+          clear, honest signal that it's no longer active, and the
+          composer below is replaced entirely rather than just
+          disabled, so there's no ambiguity about whether posting is
+          still possible. */}
+      {channel.is_archived && (
+        <div className="flex items-center gap-2 rounded-xl border border-dashed border-hairline bg-canvas px-4 py-3">
+          <Archive className="h-4 w-4 shrink-0 text-ink/40" />
+          <p className="text-sm text-ink/50">
+            This channel has been archived. You can still read its history, but no new messages or files can be added.
+          </p>
+        </div>
+      )}
+
       {messagesError && <p className="text-sm text-red-600">{messagesError}</p>}
 
       {!messagesError && <MessageList messages={messages} channelId={id} />}
 
-      {isMember ? (
+      {channel.is_archived ? null : isMember ? (
         <NewMessageForm channelId={id} />
       ) : (
         <p className="text-sm text-ink/50">Join this channel to post messages.</p>

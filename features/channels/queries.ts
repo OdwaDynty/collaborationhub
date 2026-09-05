@@ -87,7 +87,7 @@ export async function getChannelMessages(channelId: string): Promise<{
 }
 
 export async function getChannelById(channelId: string): Promise<{
-  channel: Pick<Channel, "id" | "name" | "description" | "visibility"> | null;
+  channel: Pick<Channel, "id" | "name" | "description" | "visibility" | "is_archived"> | null;
   isMember: boolean;
   error: string | null;
 }> {
@@ -98,7 +98,9 @@ export async function getChannelById(channelId: string): Promise<{
 
   const { data: channel, error } = await supabase
     .from("channels")
-    .select("id, name, description, visibility")
+    // is_archived added — the channel detail page needs this to
+    // decide whether to show the composer or a read-only banner.
+    .select("id, name, description, visibility, is_archived")
     .eq("id", channelId)
     .single();
 
