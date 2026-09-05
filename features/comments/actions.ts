@@ -4,9 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createCommentSchema } from "./schema";
 import { revalidatePath } from "next/cache";
 
-export async function createComment(
-  formData: FormData
-): Promise<{ error: string | null }> {
+type ActionResult = { error: string | null };
+
+export async function createComment(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
 
   const {
@@ -26,8 +26,6 @@ export async function createComment(
     return { error: parsed.error.issues[0].message };
   }
 
-  // RLS also enforces that the post must be visible to this user —
-  // this insert will be silently rejected by the database if not.
   const { error } = await supabase.from("comments").insert({
     post_id: parsed.data.postId,
     author_id: user.id,
@@ -37,6 +35,26 @@ export async function createComment(
   if (error) {
     console.error("createComment error:", error.message);
     return { error: "Unable to post comment. Please try again." };
+  }
+
+  revalidatePath("/home");
+  return { error: null };
+}
+
+export async function deleteComment(commentId: string): Promise<ActionResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("soft_delete_comment", {
+    p_comment_id: commentId,
+  });
+
+  if (error) {
+    console.error("deleteComment error:", error.message);
+    return {
+      error: error.message.includes("permission")
+        ? "You can only delete your own comments."
+        : "Unable to delete comment. Please try again.",
+    };
   }
 
   revalidatePath("/home");

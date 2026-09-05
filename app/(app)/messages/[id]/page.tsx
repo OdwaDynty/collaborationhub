@@ -58,7 +58,7 @@ export default async function ConversationPage({
         </h1>
       </div>
 
-      <MessageThread messages={messages} currentUserId={user!.id} />
+      <MessageThread messages={messages} currentUserId={user!.id} conversationId={id} />
 
       <NewMessageForm conversationId={id} />
     </div>

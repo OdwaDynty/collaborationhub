@@ -2,14 +2,22 @@ import Link from "next/link";
 import { CalendarPlus } from "lucide-react";
 import type { Announcement, AnnouncementComment } from "@/types/announcements";
 import { NewAnnouncementCommentForm } from "./new-announcement-form";
+import { InlineDeleteButton } from "@/features/shared/inline-delete-button";
+import { deleteAnnouncementComment } from "./actions";
+import { createClient } from "@/lib/supabase/server";
 
-export function AnnouncementCard({
+export async function AnnouncementCard({
   announcement,
   comments,
 }: {
   announcement: Announcement;
   comments: AnnouncementComment[];
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <article className="rounded-xl border border-hairline bg-white p-4">
       <div className="flex items-center justify-between gap-2">
@@ -32,11 +40,6 @@ export function AnnouncementCard({
         {new Date(announcement.created_at).toLocaleString()}
       </time>
 
-      {/* Only shown if this announcement actually has an event date/time
-          attached — plain news announcements (event_at is null) don't
-          get this button at all. Using Link here instead of a raw <a>
-          tag — functionally the same for a download link, but avoids
-          the tag being mangled when copied from chat. */}
       {announcement.event_at && (
         <Link
           href={`/api/calendar/announcement/${announcement.id}`}
@@ -55,11 +58,20 @@ export function AnnouncementCard({
       {comments.length > 0 && (
         <ul className="mt-3 space-y-2 border-t border-hairline pt-3">
           {comments.map((c) => (
-            <li key={c.id} className="text-sm">
-              <span className="font-heading font-semibold text-ink">
-                {c.author.full_name}
-              </span>{" "}
-              <span className="text-ink/70">{c.content}</span>
+            <li key={c.id} className="group flex items-start justify-between gap-2 text-sm">
+              <p>
+                <span className="font-heading font-semibold text-ink">
+                  {c.author.full_name}
+                </span>{" "}
+                <span className="text-ink/70">{c.content}</span>
+              </p>
+              {user?.id === c.authorId && (
+               <InlineDeleteButton
+                  deleteAction={deleteAnnouncementComment}
+                  args={[c.id]}
+                  successMessage="Comment deleted"
+                 />
+              )}
             </li>
           ))}
         </ul>

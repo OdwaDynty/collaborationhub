@@ -13,6 +13,7 @@ export type ChannelMessage = {
   content: string;
   parent_message_id: string | null;
   created_at: string;
+  authorId: string;
   author: {
     full_name: string;
   };

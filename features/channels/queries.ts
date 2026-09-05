@@ -1,9 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Channel, ChannelMessage } from "@/types/channels";
 
-// Fetches channels visible to the current user (public + ones they're a
-// member of, per RLS) along with whether they're already a member —
-// used to decide whether to show "Join" or "Open" in the UI.
 export async function getChannels(): Promise<{
   channels: Channel[];
   error: string | null;
@@ -54,7 +51,7 @@ export async function getChannelMessages(channelId: string): Promise<{
     .from("channel_messages")
     .select(
       `
-      id, content, parent_message_id, created_at,
+      id, content, parent_message_id, created_at, author_id,
       author:profiles!channel_messages_author_id_fkey ( full_name )
     `
     )
@@ -68,13 +65,29 @@ export async function getChannelMessages(channelId: string): Promise<{
     return { messages: [], error: "Unable to load messages. You may not be a member." };
   }
 
-  return { messages: (data ?? []) as unknown as ChannelMessage[], error: null };
+  type RawRow = {
+    id: string;
+    content: string;
+    parent_message_id: string | null;
+    created_at: string;
+    author_id: string;
+    author: { full_name: string };
+  };
+
+  const messages: ChannelMessage[] = (data as unknown as RawRow[]).map((row) => ({
+    id: row.id,
+    content: row.content,
+    parent_message_id: row.parent_message_id,
+    created_at: row.created_at,
+    authorId: row.author_id,
+    author: row.author,
+  }));
+
+  return { messages, error: null };
 }
 
-// Add this function to the existing features/channels/queries.ts
-
 export async function getChannelById(channelId: string): Promise<{
-  channel: (Channel extends never ? never : Pick<Channel, "id" | "name" | "description" | "visibility">) | null;
+  channel: Pick<Channel, "id" | "name" | "description" | "visibility"> | null;
   isMember: boolean;
   error: string | null;
 }> {
@@ -90,8 +103,6 @@ export async function getChannelById(channelId: string): Promise<{
     .single();
 
   if (error || !channel) {
-    // RLS returns no row for private channels the user isn't in —
-    // same "not found" path whether it truly doesn't exist or is hidden.
     return { channel: null, isMember: false, error: "Channel not found." };
   }
 

@@ -49,7 +49,7 @@ export default async function ChannelDetailPage({
 
       {messagesError && <p className="text-sm text-red-600">{messagesError}</p>}
 
-      {!messagesError && <MessageList messages={messages} />}
+      {!messagesError && <MessageList messages={messages} channelId={id} />}
 
       {isMember ? (
         <NewMessageForm channelId={id} />

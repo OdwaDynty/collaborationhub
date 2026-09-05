@@ -9,9 +9,6 @@ export type Announcement = {
   content: string;
   scope: "organization" | "department";
   created_at: string;
-  // ISO timestamp string if this announcement has an associated calendar
-  // event (e.g. "Q3 All-Hands"), or null if it's just a regular
-  // announcement with no specific date/time attached.
   event_at: string | null;
   author: {
     full_name: string;
@@ -25,6 +22,7 @@ export type AnnouncementComment = {
   id: string;
   content: string;
   created_at: string;
+  authorId: string;
   author: {
     full_name: string;
   };

@@ -4,11 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createPostSchema } from "./schema";
 import { revalidatePath } from "next/cache";
 
-type CreatePostResult = { error: string | null };
+type ActionResult = { error: string | null };
 
-export async function createPost(
-  formData: FormData
-): Promise<CreatePostResult> {
+export async function createPost(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
 
   const {
@@ -28,10 +26,6 @@ export async function createPost(
     return { error: parsed.error.issues[0].message };
   }
 
-  // Fetch the author's own permissions + department. Never trust
-  // scope/department values submitted by the client alone — RLS
-  // enforces this too, but checking here lets us return a clear
-  // error message instead of a generic database rejection.
   const { data: profile } = await supabase
     .from("profiles")
     .select("department_id, can_post_org_wide, can_post_department")
@@ -61,6 +55,35 @@ export async function createPost(
   if (error) {
     console.error("createPost error:", error.message);
     return { error: "Unable to create post. Please try again." };
+  }
+
+  revalidatePath("/home");
+  return { error: null };
+}
+
+/**
+ * Soft-deletes a post the current user authored. Calls the
+ * soft_delete_post() database function rather than a plain UPDATE —
+ * that function itself checks the caller is the real author, so this
+ * action doesn't need (and shouldn't attempt) its own permission
+ * check; the database is the single source of truth for that.
+ */
+export async function deletePost(postId: string): Promise<ActionResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("soft_delete_post", {
+    p_post_id: postId,
+  });
+
+  if (error) {
+    console.error("deletePost error:", error.message);
+    // The database function raises a specific exception on a
+    // permission failure — surfaced here as a plain, honest message
+    // rather than a generic one, since "you don't have permission" is
+    // meaningfully different from "something went wrong."
+    return { error: error.message.includes("permission")
+      ? "You can only delete your own posts."
+      : "Unable to delete post. Please try again." };
   }
 
   revalidatePath("/home");

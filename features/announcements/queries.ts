@@ -11,8 +11,6 @@ export async function getAnnouncements(): Promise<{
 
   const { data, error } = await supabase
     .from("announcements")
-    // event_at added to the select list so the card component can
-    // check whether to show the "Add to Calendar" button.
     .select(
       `
       id, title, content, scope, created_at, event_at,
@@ -45,11 +43,12 @@ export async function getCommentsForAnnouncements(
     .from("announcement_comments")
     .select(
       `
-      id, content, created_at, announcement_id,
+      id, content, created_at, announcement_id, author_id,
       author:profiles!announcement_comments_author_id_fkey ( full_name )
     `
     )
     .in("announcement_id", announcementIds)
+    .eq("is_deleted", false)
     .order("created_at", { ascending: true });
 
   if (error) {
@@ -57,13 +56,26 @@ export async function getCommentsForAnnouncements(
     return {};
   }
 
-  // Groups the flat list of comments by which announcement they belong
-  // to, so the page can just do commentsByAnnouncement[announcement.id]
-  // instead of filtering the whole list for every single announcement.
+  type RawRow = {
+    id: string;
+    content: string;
+    created_at: string;
+    announcement_id: string;
+    author_id: string;
+    author: { full_name: string };
+  };
+
   const grouped: Record<string, AnnouncementComment[]> = {};
-  for (const row of data as unknown as (AnnouncementComment & { announcement_id: string })[]) {
+  for (const row of data as unknown as RawRow[]) {
+    const comment: AnnouncementComment = {
+      id: row.id,
+      content: row.content,
+      created_at: row.created_at,
+      authorId: row.author_id,
+      author: row.author,
+    };
     grouped[row.announcement_id] = grouped[row.announcement_id] ?? [];
-    grouped[row.announcement_id].push(row);
+    grouped[row.announcement_id].push(comment);
   }
   return grouped;
 }

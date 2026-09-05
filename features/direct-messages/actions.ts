@@ -136,3 +136,26 @@ export async function markConversationNotificationsRead(
   revalidatePath("/", "layout");
   return { error: null };
 }
+
+export async function deleteDirectMessage(
+  messageId: string,
+  conversationId: string
+): Promise<ActionResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("soft_delete_direct_message", {
+    p_message_id: messageId,
+  });
+
+  if (error) {
+    console.error("deleteDirectMessage error:", error.message);
+    return {
+      error: error.message.includes("permission")
+        ? "You can only delete your own messages."
+        : "Unable to delete message. Please try again.",
+    };
+  }
+
+  revalidatePath(`/messages/${conversationId}`);
+  return { error: null };
+}

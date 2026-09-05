@@ -26,8 +26,6 @@ export async function createChannel(formData: FormData): Promise<ActionResult> {
     return { error: parsed.error.issues[0].message };
   }
 
-  // Check permission here for a clear error message — RLS enforces
-  // it too, but a raw insert rejection isn't user-friendly.
   const { data: profile } = await supabase
     .from("profiles")
     .select("can_create_channels")
@@ -54,7 +52,6 @@ export async function createChannel(formData: FormData): Promise<ActionResult> {
     return { error: "Unable to create channel. Please try again." };
   }
 
-  // Creator auto-joins as channel admin.
   const { error: memberError } = await supabase.from("channel_members").insert({
     channel_id: channel.id,
     profile_id: user.id,
@@ -150,6 +147,29 @@ export async function postChannelMessage(
   if (error) {
     console.error("postChannelMessage error:", error.message);
     return { error: "Unable to post message. You may not be a member." };
+  }
+
+  revalidatePath(`/channels/${channelId}`);
+  return { error: null };
+}
+
+export async function deleteChannelMessage(
+  messageId: string,
+  channelId: string
+): Promise<ActionResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("soft_delete_channel_message", {
+    p_message_id: messageId,
+  });
+
+  if (error) {
+    console.error("deleteChannelMessage error:", error.message);
+    return {
+      error: error.message.includes("permission")
+        ? "You can only delete your own messages."
+        : "Unable to delete message. Please try again.",
+    };
   }
 
   revalidatePath(`/channels/${channelId}`);

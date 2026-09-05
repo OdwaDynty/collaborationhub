@@ -46,15 +46,9 @@ export async function createAnnouncement(
     return { error: "Select a department for a department-scoped announcement." };
   }
 
-  // Convert the "2026-09-15T10:00" datetime-local string into a real
-  // Date, then into an ISO string the database's timestamptz column
-  // expects. Only do this if the field was actually filled in — an
-  // empty/missing eventAt means "no calendar event," stored as NULL.
   let eventAtIso: string | null = null;
   if (parsed.data.eventAt) {
     const parsedDate = new Date(parsed.data.eventAt);
-    // Guard against an invalid date string producing "Invalid Date"
-    // (which would otherwise silently insert garbage into the database).
     if (!isNaN(parsedDate.getTime())) {
       eventAtIso = parsedDate.toISOString();
     }
@@ -74,8 +68,6 @@ export async function createAnnouncement(
     return { error: "Unable to create announcement. Please try again." };
   }
 
-  // Tells Next.js to refetch fresh data for these two pages next time
-  // they're visited, since the data just changed.
   revalidatePath("/announcements");
   revalidatePath("/calendar");
   return { error: null };
@@ -112,6 +104,28 @@ export async function createAnnouncementComment(
   if (error) {
     console.error("createAnnouncementComment error:", error.message);
     return { error: "Unable to post comment. Please try again." };
+  }
+
+  revalidatePath("/announcements");
+  return { error: null };
+}
+
+export async function deleteAnnouncementComment(
+  commentId: string
+): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("soft_delete_announcement_comment", {
+    p_comment_id: commentId,
+  });
+
+  if (error) {
+    console.error("deleteAnnouncementComment error:", error.message);
+    return {
+      error: error.message.includes("permission")
+        ? "You can only delete your own comments."
+        : "Unable to delete comment. Please try again.",
+    };
   }
 
   revalidatePath("/announcements");
