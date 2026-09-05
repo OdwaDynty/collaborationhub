@@ -11,9 +11,11 @@ export async function getAnnouncements(): Promise<{
 
   const { data, error } = await supabase
     .from("announcements")
+    // event_at added to the select list so the card component can
+    // check whether to show the "Add to Calendar" button.
     .select(
       `
-      id, title, content, scope, created_at,
+      id, title, content, scope, created_at, event_at,
       author:profiles!announcements_author_id_fkey ( full_name ),
       department:departments ( name )
     `
@@ -55,6 +57,9 @@ export async function getCommentsForAnnouncements(
     return {};
   }
 
+  // Groups the flat list of comments by which announcement they belong
+  // to, so the page can just do commentsByAnnouncement[announcement.id]
+  // instead of filtering the whole list for every single announcement.
   const grouped: Record<string, AnnouncementComment[]> = {};
   for (const row of data as unknown as (AnnouncementComment & { announcement_id: string })[]) {
     grouped[row.announcement_id] = grouped[row.announcement_id] ?? [];

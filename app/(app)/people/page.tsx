@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { searchPeople } from "@/features/people/queries";
 import { MessageButton } from "@/features/direct-messages/message-button";
 import { createClient } from "@/lib/supabase/server";
@@ -54,8 +55,21 @@ export default async function PeoplePage({
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
+      {/* Distinguishes "no results for this specific search" from a
+          generic empty page — worth telling the admin what they
+          searched for, since a typo is the most common real cause. */}
       {!error && people.length === 0 && (
-        <p className="text-sm text-ink/50">No employees found.</p>
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-hairline bg-white py-10 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-teal/10">
+            <Search className="h-5 w-5 text-brand-teal-ink" />
+          </div>
+          <p className="text-sm font-medium text-ink">
+            {q ? `No results for "${q}"` : "No employees found"}
+          </p>
+          <p className="max-w-xs text-sm text-ink/50">
+            Try a different spelling, or search by first or last name only.
+          </p>
+        </div>
       )}
 
       <ul className="divide-y divide-hairline rounded-xl border border-hairline bg-white">

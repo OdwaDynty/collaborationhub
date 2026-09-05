@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { toast } from "sonner";
 import { createBirthdayWish } from "./actions";
 
 export function NewWishForm({ profileId }: { profileId: string }) {
@@ -16,6 +17,7 @@ export function NewWishForm({ profileId }: { profileId: string }) {
         setError(result.error);
       } else {
         formRef.current?.reset();
+        toast.success("Message sent");
       }
     });
   }

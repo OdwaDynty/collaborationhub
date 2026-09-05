@@ -25,6 +25,7 @@ export async function createAnnouncement(
     content: formData.get("content"),
     scope: formData.get("scope"),
     department_id: formData.get("department_id") || undefined,
+    eventAt: formData.get("eventAt") || undefined,
   });
 
   if (!parsed.success) {
@@ -45,12 +46,27 @@ export async function createAnnouncement(
     return { error: "Select a department for a department-scoped announcement." };
   }
 
+  // Convert the "2026-09-15T10:00" datetime-local string into a real
+  // Date, then into an ISO string the database's timestamptz column
+  // expects. Only do this if the field was actually filled in — an
+  // empty/missing eventAt means "no calendar event," stored as NULL.
+  let eventAtIso: string | null = null;
+  if (parsed.data.eventAt) {
+    const parsedDate = new Date(parsed.data.eventAt);
+    // Guard against an invalid date string producing "Invalid Date"
+    // (which would otherwise silently insert garbage into the database).
+    if (!isNaN(parsedDate.getTime())) {
+      eventAtIso = parsedDate.toISOString();
+    }
+  }
+
   const { error } = await supabase.from("announcements").insert({
     author_id: user.id,
     title: parsed.data.title,
     content: parsed.data.content,
     scope: parsed.data.scope,
     department_id: parsed.data.scope === "department" ? parsed.data.department_id : null,
+    event_at: eventAtIso,
   });
 
   if (error) {
@@ -58,7 +74,10 @@ export async function createAnnouncement(
     return { error: "Unable to create announcement. Please try again." };
   }
 
+  // Tells Next.js to refetch fresh data for these two pages next time
+  // they're visited, since the data just changed.
   revalidatePath("/announcements");
+  revalidatePath("/calendar");
   return { error: null };
 }
 

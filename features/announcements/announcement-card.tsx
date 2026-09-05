@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { CalendarPlus } from "lucide-react";
 import type { Announcement, AnnouncementComment } from "@/types/announcements";
 import { NewAnnouncementCommentForm } from "./new-announcement-form";
 
@@ -29,6 +31,26 @@ export function AnnouncementCard({
       <time className="mt-2 block text-xs text-ink/40">
         {new Date(announcement.created_at).toLocaleString()}
       </time>
+
+      {/* Only shown if this announcement actually has an event date/time
+          attached — plain news announcements (event_at is null) don't
+          get this button at all. Using Link here instead of a raw <a>
+          tag — functionally the same for a download link, but avoids
+          the tag being mangled when copied from chat. */}
+      {announcement.event_at && (
+        <Link
+          href={`/api/calendar/announcement/${announcement.id}`}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-teal/10 px-3 py-1.5 text-xs font-medium text-brand-teal-ink transition-colors hover:bg-brand-teal/20"
+        >
+          <CalendarPlus className="h-3.5 w-3.5" />
+          Add to Calendar — {new Date(announcement.event_at).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Link>
+      )}
 
       {comments.length > 0 && (
         <ul className="mt-3 space-y-2 border-t border-hairline pt-3">

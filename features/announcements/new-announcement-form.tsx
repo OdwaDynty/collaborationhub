@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { toast } from "sonner";
 import { createAnnouncement, createAnnouncementComment } from "./actions";
 
 type Department = { id: string; name: string };
@@ -9,6 +10,11 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [scope, setScope] = useState<"organization" | "department">("organization");
+  // Tracks whether the "Add to Calendar" checkbox is ticked. When it
+  // is, we show the date/time input; when it isn't, we hide it AND
+  // clear out any value so an accidentally-filled-then-hidden date
+  // never gets submitted.
+  const [hasEvent, setHasEvent] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleSubmit(formData: FormData) {
@@ -20,6 +26,8 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
       } else {
         formRef.current?.reset();
         setScope("organization");
+        setHasEvent(false);
+        toast.success("Announcement published");
       }
     });
   }
@@ -45,6 +53,34 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
         placeholder="Announcement content..."
         className="w-full resize-none rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
       />
+
+      {/* Calendar event toggle — a plain checkbox with a clear label,
+          not a fancy custom switch, to keep this simple and accessible
+          rather than reaching for extra styling that adds no real
+          function. */}
+      <div className="rounded-lg border border-hairline bg-canvas p-3">
+        <label className="flex items-center gap-2 text-sm text-ink">
+          <input
+            type="checkbox"
+            checked={hasEvent}
+            onChange={(e) => setHasEvent(e.target.checked)}
+            className="h-4 w-4 rounded border-hairline accent-brand-teal"
+          />
+          Add to Calendar
+        </label>
+
+        {/* Only rendered (and only submitted, since unmounted fields
+            aren't included in FormData) when the checkbox above is
+            checked. */}
+        {hasEvent && (
+          <input
+            name="eventAt"
+            type="datetime-local"
+            required={hasEvent}
+            className="mt-2 w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
+          />
+        )}
+      </div>
 
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">

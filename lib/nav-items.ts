@@ -1,4 +1,4 @@
-import { Home, Megaphone, Users, Cake, Hash, MessageCircle, ShieldCheck, Folder, BarChart3, LucideIcon } from "lucide-react";
+import { Home, Megaphone, Users, Cake, Hash, MessageCircle, ShieldCheck, Folder, BarChart3, Calendar, LucideIcon } from "lucide-react";
 
 export type NavItem = {
   href: string;
@@ -12,6 +12,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/channels", label: "Channels", icon: Hash },
   { href: "/files", label: "Files", icon: Folder },
   { href: "/announcements", label: "Announcements", icon: Megaphone },
+  { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/people", label: "People", icon: Users },
   { href: "/birthdays", label: "Birthdays", icon: Cake },
 ];

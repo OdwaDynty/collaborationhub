@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import type { AdminEmployee, Department } from "@/types/admin";
 import {
   updateEmployeePermissions,
@@ -34,11 +35,20 @@ export function EmployeeRow({
   const [jobTitle, setJobTitle] = useState(employee.job_title ?? "");
   const [birthday, setBirthday] = useState(employee.birthday ?? "");
 
+  // Every handler below follows the same shape: clear any old error,
+  // run the update, and on success show a toast naming BOTH the person
+  // and what changed — for an admin managing many employees, a generic
+  // "Updated" toast wouldn't tell them which action just fired.
   function handleFlagToggle(key: keyof AdminEmployee, current: boolean) {
     setError(null);
     startTransition(async () => {
       const result = await updateEmployeePermissions(employee.id, { [key]: !current });
-      if (result.error) setError(result.error);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        const label = FLAGS.find((f) => f.key === key)?.label ?? "Permission";
+        toast.success(`${label} ${!current ? "enabled" : "disabled"} for ${employee.full_name}`);
+      }
     });
   }
 
@@ -46,26 +56,39 @@ export function EmployeeRow({
     setError(null);
     startTransition(async () => {
       const result = await updateEmployeePermissions(employee.id, { role });
-      if (result.error) setError(result.error);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        toast.success(`${employee.full_name} is now ${role === "admin" ? "an Admin" : "an Employee"}`);
+      }
     });
   }
 
   function handleActiveToggle() {
     setError(null);
     startTransition(async () => {
-      const result = await toggleEmployeeActive(employee.id, !employee.is_active);
-      if (result.error) setError(result.error);
+      const nextActive = !employee.is_active;
+      const result = await toggleEmployeeActive(employee.id, nextActive);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        toast.success(`${employee.full_name} ${nextActive ? "activated" : "deactivated"}`);
+      }
     });
   }
 
   function handleJobTitleBlur() {
-    if (jobTitle === (employee.job_title ?? "")) return;
+    if (jobTitle === (employee.job_title ?? "")) return; // nothing actually changed, skip the request entirely
     setError(null);
     startTransition(async () => {
       const result = await updateEmployeeProfile(employee.id, {
         job_title: jobTitle || null,
       });
-      if (result.error) setError(result.error);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        toast.success(`Job title updated for ${employee.full_name}`);
+      }
     });
   }
 
@@ -75,7 +98,11 @@ export function EmployeeRow({
       const result = await updateEmployeeProfile(employee.id, {
         department_id: departmentId || null,
       });
-      if (result.error) setError(result.error);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        toast.success(`Department updated for ${employee.full_name}`);
+      }
     });
   }
 
@@ -86,7 +113,11 @@ export function EmployeeRow({
       const result = await updateEmployeeProfile(employee.id, {
         birthday: birthday || null,
       });
-      if (result.error) setError(result.error);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        toast.success(`Birthday updated for ${employee.full_name}`);
+      }
     });
   }
 

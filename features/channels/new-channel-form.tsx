@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { toast } from "sonner"; // same toast library already used on Home/Messages/Files
 import { createChannel } from "./actions";
 
 export function NewChannelForm() {
@@ -16,6 +17,9 @@ export function NewChannelForm() {
         setError(result.error);
       } else {
         formRef.current?.reset();
+        // Confirms creation succeeded — matches the confirmation pattern
+        // already used for posts, messages, and file uploads elsewhere.
+        toast.success("Channel created");
       }
     });
   }

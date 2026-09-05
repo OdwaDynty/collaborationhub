@@ -4,7 +4,15 @@ export type ReportingStats = {
   activeChannels: number;
 };
 
-export type DepartmentEngagement = {
-  departmentName: string;
+// Generic "label + count" shape shared by Department, Business Unit,
+// and Country engagement — one type, one chart component, instead of
+// three near-identical ones.
+export type EngagementBreakdown = {
+  label: string;
   postCount: number;
+};
+
+export type CountryHeadcount = {
+  countryName: string;
+  employeeCount: number;
 };

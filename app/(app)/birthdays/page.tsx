@@ -1,3 +1,4 @@
+import { Cake } from "lucide-react";
 import { getUpcomingBirthdays, getWishesForProfiles } from "@/features/birthdays/queries";
 import { NewWishForm } from "@/features/birthdays/new-wish-form";
 
@@ -74,8 +75,18 @@ export default async function BirthdaysPage() {
             <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/40">
               Upcoming (next 30 days)
             </h2>
+            {/* Matches the same "icon + headline + sentence" pattern as
+                the other empty states, instead of the old single gray
+                line — the whole point of this pass is consistency. */}
             {upcoming.length === 0 ? (
-              <p className="text-sm text-ink/40">No upcoming birthdays.</p>
+              <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-hairline bg-white py-8 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-teal/10">
+                  <Cake className="h-4 w-4 text-brand-teal-ink" />
+                </div>
+                <p className="text-sm text-ink/50">
+                  No birthdays in the next 30 days.
+                </p>
+              </div>
             ) : (
               <ul className="divide-y divide-hairline rounded-xl border border-hairline bg-white">
                 {upcoming.map((b) => (
