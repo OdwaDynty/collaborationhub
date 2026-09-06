@@ -11,9 +11,9 @@ export async function getAnnouncements(): Promise<{
 
   const { data, error } = await supabase
     .from("announcements")
-    .select(
+      .select(
       `
-      id, title, content, scope, created_at, event_at,
+      id, title, content, summary, scope, created_at, event_at,
       author:profiles!announcements_author_id_fkey ( full_name ),
       department:departments ( name )
     `

@@ -1,12 +1,11 @@
-// Shared TypeScript types for the Announcements feature. Keeping these
-// in one place means every file that touches an Announcement agrees on
-// its exact shape — if the database changes, this is the one file to
-// update, and TypeScript will then flag every place that needs fixing.
-
 export type Announcement = {
   id: string;
   title: string;
   content: string;
+  // A short AI-generated TL;DR, or null if one hasn't been generated
+  // (e.g. the AI call failed at publish time) — the UI should treat
+  // null as "no summary available", never as an error.
+  summary: string | null;
   scope: "organization" | "department";
   created_at: string;
   event_at: string | null;

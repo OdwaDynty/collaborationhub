@@ -85,3 +85,33 @@ export async function getHeadcountByCountry(): Promise<{
     error: null,
   };
 }
+
+/**
+ * Fetches the cached digest for a specific week, if one has already
+ * been generated. Returns null (not an error) if nothing exists yet
+ * for that week — that's the normal, expected state before anyone's
+ * clicked "Generate" this week.
+ */
+export async function getDigestForWeek(weekStart: string): Promise<{
+  digest: { content: string; generatedAt: string } | null;
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("insight_digests")
+    .select("content, generated_at")
+    .eq("week_start", weekStart)
+    .maybeSingle();
+
+  if (error) {
+    console.error("getDigestForWeek error:", error.message);
+    return { digest: null, error: "Unable to load this week's insight." };
+  }
+
+  if (!data) {
+    return { digest: null, error: null };
+  }
+
+  return { digest: { content: data.content, generatedAt: data.generated_at }, error: null };
+}

@@ -6,6 +6,7 @@ import {
   createAnnouncementCommentSchema,
 } from "./schema";
 import { revalidatePath } from "next/cache";
+import { generateText } from "@/lib/ai/openai";
 
 export async function createAnnouncement(
   formData: FormData
@@ -54,10 +55,29 @@ export async function createAnnouncement(
     }
   }
 
+  // Generate a short TL;DR before inserting. If this fails for any
+  // reason (API down, rate-limited, misconfigured key), it's treated
+  // as non-fatal — `summary` is nullable specifically so an AI hiccup
+  // can never block a real official announcement from being
+  // published. The generated text is capped hard at 280 characters as
+  // a defensive limit, independent of whatever the AI actually
+  // returns.
+  let summary: string | null = null;
+  const { text: generatedSummary } = await generateText({
+    systemPrompt:
+      "Summarize the following company announcement in exactly one short, plain sentence — the key takeaway an employee needs, nothing else. No preamble.",
+    userPrompt: parsed.data.content,
+    maxTokens: 60,
+  });
+  if (generatedSummary) {
+    summary = generatedSummary.slice(0, 280);
+  }
+
   const { error } = await supabase.from("announcements").insert({
     author_id: user.id,
     title: parsed.data.title,
     content: parsed.data.content,
+    summary,
     scope: parsed.data.scope,
     department_id: parsed.data.scope === "department" ? parsed.data.department_id : null,
     event_at: eventAtIso,
@@ -130,4 +150,36 @@ export async function deleteAnnouncementComment(
 
   revalidatePath("/announcements");
   return { error: null };
+}
+
+/**
+ * Takes a manager's rough draft text and returns a clearer, more
+ * professional version — same idea as the TL;DR and weekly digest
+ * features, just applied at draft time instead of after publishing.
+ *
+ * Deliberately does NOT publish anything itself — it only returns
+ * improved text for the composer to drop back into the textarea, so
+ * the person writing it still reviews and can further edit before
+ * ever clicking the real Publish button. The AI never gets to publish
+ * on someone's behalf, only to suggest wording.
+ */
+export async function polishAnnouncementDraft(
+  rawContent: string
+): Promise<{ text: string | null; error: string | null }> {
+  if (!rawContent || rawContent.trim().length < 10) {
+    return { text: null, error: "Write a bit more before polishing." };
+  }
+
+  const { text, error } = await generateText({
+    systemPrompt:
+      "You improve a rough draft of a company announcement into clear, professional wording suitable for an official internal communication. Preserve every factual detail, date, and name exactly as given — never invent or omit information. Return ONLY the improved announcement text itself, with no preamble, no quotation marks around it, and no explanation.",
+    userPrompt: rawContent,
+    maxTokens: 400,
+  });
+
+  if (error || !text) {
+    return { text: null, error: error ?? "Unable to polish this draft right now." };
+  }
+
+  return { text, error: null };
 }

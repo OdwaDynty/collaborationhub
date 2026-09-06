@@ -1,11 +1,14 @@
-import { Globe2 } from "lucide-react";
 import {
   getReportingStats,
   getEngagementByLevel,
   getHeadcountByCountry,
+  getDigestForWeek,
 } from "@/features/reports/queries";
 import { isCurrentUserAdmin } from "@/features/admin/queries";
 import { LevelTabs } from "@/features/reports/level-tabs";
+import { DigestCard } from "@/features/reports/digest-card";
+import { getWeekStart } from "@/lib/dates";
+import { Globe2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -24,17 +27,18 @@ export default async function ReportsPage() {
   }
 
   const { stats, error: statsError } = await getReportingStats();
-  // Fetches department-level data on the server for the initial view —
-  // LevelTabs then handles switching to Business Unit / Country itself.
   const { engagement: departmentEngagement, error: engagementError } =
     await getEngagementByLevel("department");
   const { headcount, error: headcountError } = await getHeadcountByCountry();
+  const { digest } = await getDigestForWeek(getWeekStart());
 
   const totalHeadcount = headcount.reduce((sum, h) => sum + h.employeeCount, 0);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 p-6">
       <h1 className="font-heading text-lg font-semibold text-ink">Reports</h1>
+
+      <DigestCard initialDigest={digest} />
 
       {statsError && <p className="text-sm text-red-600">{statsError}</p>}
 
@@ -61,10 +65,6 @@ export default async function ReportsPage() {
         </div>
       )}
 
-      {/* Global headcount — this is the actual "see the whole
-          organization" view, distinct from engagement/activity. A
-          People Systems Manager needs to know WHERE the workforce is
-          before anything about how active they are. */}
       {headcountError && <p className="text-sm text-red-600">{headcountError}</p>}
       {headcount.length > 0 && (
         <div className="rounded-xl border border-hairline bg-white p-5">

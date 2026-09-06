@@ -2,20 +2,24 @@
 
 import { useState, useTransition, useRef } from "react";
 import { toast } from "sonner";
-import { createAnnouncement, createAnnouncementComment } from "./actions";
+import { Wand2 } from "lucide-react";
+import { createAnnouncement, createAnnouncementComment, polishAnnouncementDraft } from "./actions";
 
 type Department = { id: string; name: string };
 
 export function NewAnnouncementForm({ departments }: { departments: Department[] }) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isPolishing, startPolishing] = useTransition();
   const [scope, setScope] = useState<"organization" | "department">("organization");
-  // Tracks whether the "Add to Calendar" checkbox is ticked. When it
-  // is, we show the date/time input; when it isn't, we hide it AND
-  // clear out any value so an accidentally-filled-then-hidden date
-  // never gets submitted.
   const [hasEvent, setHasEvent] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  // A ref directly on the textarea (rather than making it a fully
+  // controlled React input) lets the Polish button read its current
+  // text and overwrite it in place, while everything else about this
+  // form stays exactly as it was — a plain uncontrolled field
+  // submitted via FormData, matching every other form in this app.
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   function handleSubmit(formData: FormData) {
     setError(null);
@@ -28,6 +32,24 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
         setScope("organization");
         setHasEvent(false);
         toast.success("Announcement published");
+      }
+    });
+  }
+
+  function handlePolish() {
+    const currentText = contentRef.current?.value ?? "";
+    startPolishing(async () => {
+      const result = await polishAnnouncementDraft(currentText);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      if (result.text && contentRef.current) {
+        // Directly overwrites the textarea's value. The person can
+        // still freely edit this before publishing — Polish only
+        // suggests wording, it never submits anything itself.
+        contentRef.current.value = result.text;
+        toast.success("Draft polished — review before publishing");
       }
     });
   }
@@ -45,19 +67,30 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
         placeholder="Announcement title..."
         className="w-full rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
       />
-      <textarea
-        name="content"
-        required
-        maxLength={5000}
-        rows={3}
-        placeholder="Announcement content..."
-        className="w-full resize-none rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
-      />
 
-      {/* Calendar event toggle — a plain checkbox with a clear label,
-          not a fancy custom switch, to keep this simple and accessible
-          rather than reaching for extra styling that adds no real
-          function. */}
+      <div className="space-y-1.5">
+        <textarea
+          ref={contentRef}
+          name="content"
+          required
+          maxLength={5000}
+          rows={3}
+          placeholder="Announcement content..."
+          className="w-full resize-none rounded-lg border border-hairline bg-canvas px-3 py-2 text-sm text-ink focus:border-brand-teal focus:outline-none"
+        />
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handlePolish}
+            disabled={isPolishing}
+            className="flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1 text-xs font-medium text-ink/60 transition-colors hover:bg-canvas hover:text-brand-teal disabled:opacity-50"
+          >
+            <Wand2 className="h-3.5 w-3.5" />
+            {isPolishing ? "Polishing..." : "Polish with AI"}
+          </button>
+        </div>
+      </div>
+
       <div className="rounded-lg border border-hairline bg-canvas p-3">
         <label className="flex items-center gap-2 text-sm text-ink">
           <input
@@ -69,9 +102,6 @@ export function NewAnnouncementForm({ departments }: { departments: Department[]
           Add to Calendar
         </label>
 
-        {/* Only rendered (and only submitted, since unmounted fields
-            aren't included in FormData) when the checkbox above is
-            checked. */}
         {hasEvent && (
           <input
             name="eventAt"

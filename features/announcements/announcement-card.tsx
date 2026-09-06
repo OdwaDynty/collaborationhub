@@ -47,6 +47,12 @@ export async function AnnouncementCard({
           )}
         </div>
       </div>
+        {announcement.summary && (
+        <p className="mt-2 text-sm italic text-ink/60">
+          <span className="font-semibold not-italic text-brand-gold">TL;DR:</span>{" "}
+          {announcement.summary}
+        </p>
+        )}
       <h3 className="mt-2 font-heading text-base font-semibold text-brand-teal-ink">
         {announcement.title}
       </h3>
