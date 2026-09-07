@@ -4,6 +4,9 @@ export type AdminEmployee = {
   job_title: string | null;
   department_id: string | null;
   birthday: string | null;
+  // New: when this person actually joined — nullable, since existing
+  // employees won't have this set until an admin fills it in.
+  start_date: string | null;
   role: "employee" | "admin";
   is_active: boolean;
   can_post_org_wide: boolean;
@@ -37,4 +40,11 @@ export type ApiKey = {
   created_at: string;
   last_used_at: string | null;
   revoked_at: string | null;
+};
+
+export type CompanyEvent = {
+  id: string;
+  title: string;
+  description: string | null;
+  event_date: string;
 };

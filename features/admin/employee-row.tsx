@@ -34,11 +34,8 @@ export function EmployeeRow({
   const [error, setError] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState(employee.job_title ?? "");
   const [birthday, setBirthday] = useState(employee.birthday ?? "");
+  const [startDate, setStartDate] = useState(employee.start_date ?? "");
 
-  // Every handler below follows the same shape: clear any old error,
-  // run the update, and on success show a toast naming BOTH the person
-  // and what changed — for an admin managing many employees, a generic
-  // "Updated" toast wouldn't tell them which action just fired.
   function handleFlagToggle(key: keyof AdminEmployee, current: boolean) {
     setError(null);
     startTransition(async () => {
@@ -78,7 +75,7 @@ export function EmployeeRow({
   }
 
   function handleJobTitleBlur() {
-    if (jobTitle === (employee.job_title ?? "")) return; // nothing actually changed, skip the request entirely
+    if (jobTitle === (employee.job_title ?? "")) return;
     setError(null);
     startTransition(async () => {
       const result = await updateEmployeeProfile(employee.id, {
@@ -117,6 +114,23 @@ export function EmployeeRow({
         setError(result.error);
       } else {
         toast.success(`Birthday updated for ${employee.full_name}`);
+      }
+    });
+  }
+
+  // New — mirrors handleBirthdayBlur exactly, for the new start_date
+  // field that powers work-anniversary calendar entries.
+  function handleStartDateBlur() {
+    if (startDate === (employee.start_date ?? "")) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await updateEmployeeProfile(employee.id, {
+        start_date: startDate || null,
+      });
+      if (result.error) {
+        setError(result.error);
+      } else {
+        toast.success(`Start date updated for ${employee.full_name}`);
       }
     });
   }
@@ -176,14 +190,30 @@ export function EmployeeRow({
             </option>
           ))}
         </select>
-        <input
-          type="date"
-          value={birthday}
-          onChange={(e) => setBirthday(e.target.value)}
-          onBlur={handleBirthdayBlur}
-          disabled={isPending}
-          className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-xs text-ink"
-        />
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-ink/40">Birthday</span>
+          <input
+            type="date"
+            value={birthday}
+            onChange={(e) => setBirthday(e.target.value)}
+            onBlur={handleBirthdayBlur}
+            disabled={isPending}
+            className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-xs text-ink"
+          />
+        </div>
+        {/* New field, right next to Birthday since they share the same
+            "recurring annual date" pattern under the hood. */}
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-ink/40">Start date</span>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            onBlur={handleStartDateBlur}
+            disabled={isPending}
+            className="rounded-lg border border-hairline bg-canvas px-2 py-1 text-xs text-ink"
+          />
+        </div>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">

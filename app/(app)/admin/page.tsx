@@ -5,12 +5,15 @@ import {
   getActiveChannelsForAdmin,
   getArchivedChannelsForAdmin,
   getApiKeysForAdmin,
+  getCompanyEventsForAdmin,
   isCurrentUserAdmin,
 } from "@/features/admin/queries";
 import { EmployeeTable } from "@/features/admin/employee-table";
 import { AuditLog } from "@/features/admin/audit-log";
 import { ChannelListAdmin } from "@/features/admin/channel-list-admin";
 import { ApiKeyList } from "@/features/admin/api-key-list";
+import { CompanyEventForm } from "@/features/admin/company-event-form";
+import { CompanyEventList } from "@/features/admin/company-event-list";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -36,6 +39,7 @@ export default async function AdminPage() {
   const { channels: archivedChannels, error: archivedChannelsError } =
     await getArchivedChannelsForAdmin();
   const { keys, error: keysError } = await getApiKeysForAdmin();
+  const { events: companyEvents, error: companyEventsError } = await getCompanyEventsForAdmin();
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8 p-6">
@@ -68,6 +72,15 @@ export default async function AdminPage() {
           )}
         </section>
       )}
+
+      <section>
+        <h2 className="mb-3 font-heading text-lg font-semibold text-ink">Company events</h2>
+        <div className="space-y-3">
+          <CompanyEventForm />
+          {companyEventsError && <p className="text-sm text-red-600">{companyEventsError}</p>}
+          {!companyEventsError && <CompanyEventList events={companyEvents} />}
+        </div>
+      </section>
 
       <section>
         <h2 className="mb-3 font-heading text-lg font-semibold text-ink">API keys</h2>

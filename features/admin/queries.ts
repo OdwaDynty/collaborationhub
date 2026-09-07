@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { AdminEmployee, AuditEvent, Department, ApiKey } from "@/types/admin";
-
+import type { AdminEmployee, AuditEvent, Department, ApiKey, CompanyEvent } from "@/types/admin";
 
 // Every function here assumes the caller has already verified the
 // current user is an admin at the page level — RLS is the real
@@ -33,7 +32,7 @@ export async function getEmployeesForAdmin(): Promise<{
     .from("profiles")
     .select(
       `
-      id, full_name, job_title, department_id, birthday, role, is_active,
+      id, full_name, job_title, department_id, birthday, start_date, role, is_active,
       can_post_org_wide, can_post_department,
       can_create_announcements, can_create_channels
     `
@@ -182,4 +181,29 @@ export async function getApiKeysForAdmin(): Promise<{
   }
 
   return { keys: (data ?? []) as ApiKey[], error: null };
+}
+
+/**
+ * Lists every company event (past and future), newest-scheduled
+ * first, for Admin's management list. Phase 2's calendar grid will
+ * have its own, different query scoped to a specific month — this
+ * one is purely for the admin management view.
+ */
+export async function getCompanyEventsForAdmin(): Promise<{
+  events: CompanyEvent[];
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("company_events")
+    .select("id, title, description, event_date")
+    .order("event_date", { ascending: false });
+
+  if (error) {
+    console.error("getCompanyEventsForAdmin error:", error.message);
+    return { events: [], error: "Unable to load company events." };
+  }
+
+  return { events: data ?? [], error: null };
 }

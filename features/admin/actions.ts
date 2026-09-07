@@ -78,6 +78,9 @@ export async function updateEmployeeProfile(
     job_title?: string | null;
     department_id?: string | null;
     birthday?: string | null;
+    // New field, added for the Calendar work-anniversary feature.
+    // Follows the exact same optional-nullable shape as birthday.
+    start_date?: string | null;
   }
 ): Promise<ActionResult> {
   const guard = await requireAdmin();
@@ -142,5 +145,63 @@ export async function revokeApiKey(keyId: string): Promise<ActionResult> {
   }
 
   revalidatePath("/admin");
+  return { error: null };
+}
+
+/**
+ * Creates a standalone company event (a holiday, an all-hands) —
+ * feeds into the Calendar (Phase 2). Uses the same requireAdmin()
+ * pattern as everything else in this file for consistency, backed by
+ * the company_events_insert_by_admin RLS policy as the real
+ * enforcement either way.
+ */
+export async function createCompanyEvent(formData: FormData): Promise<ActionResult> {
+  const guard = await requireAdmin();
+  if (guard.error) return guard;
+
+  const title = (formData.get("title") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim() || null;
+  const eventDate = formData.get("event_date") as string;
+
+  if (!title || !eventDate) {
+    return { error: "Title and date are required." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase.from("company_events").insert({
+    title,
+    description,
+    event_date: eventDate,
+    created_by: user!.id,
+  });
+
+  if (error) {
+    console.error("createCompanyEvent error:", error.message);
+    return { error: "Unable to create event. Please try again." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/calendar");
+  return { error: null };
+}
+
+export async function deleteCompanyEvent(eventId: string): Promise<ActionResult> {
+  const guard = await requireAdmin();
+  if (guard.error) return guard;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("company_events").delete().eq("id", eventId);
+
+  if (error) {
+    console.error("deleteCompanyEvent error:", error.message);
+    return { error: "Unable to delete event. Please try again." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/calendar");
   return { error: null };
 }
